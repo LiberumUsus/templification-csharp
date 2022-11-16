@@ -1,0 +1,68 @@
+<style>
+ .final-count p {
+     @apply font-normal absolute -b-10 -r-3 w-3/4 bg-rose-600 p-4 rounded-br-47;
+     @apply text-sm text-white font-bold uppercase;
+ }
+ .code {
+     @apply bg-slate-300 mx-2 italic;
+ }
+ .example {
+     @apply border-slate-400 border-2 bg-white box-border p-4 pl-8 rounded-16 flex-grow;
+ }
+</style>
+<div>
+    <Row class="">
+        <div>
+            <Header type="h1" class="uppercase decoration-double">Generating HTML</Header>
+            <p>HTML content can be generated from alternative syntaxes including Markdown and Yorgmayoaml.
+                Element commands are used to indicate that the content within the element is to be interpreted by a processor
+            and then converted into HTML.</p>
+            <Header type="h2">Foundations: Simple HTML Generation Syntax</Header>
+            <p>A native method for generating HTML exists to alleviate creating the same type of element
+                over and over with different internal content. The <i> VOID</i> tag can be used to generate content
+            without wrapping the content in a parent element.</p>
+            <p>For example if a simple list was to be created with string content and the same element with the same
+                attributes over and over the following would do this.</p>
+            <p>As the requirements become more complicated this feature becomes increasingly pointless. However, for simple lists or
+                repeating elements with different text it is very useful.</p>
+            <div class="p-4 bg-slate-300 mt-4 flex gap-10">
+                <div>
+                    &lt;ul class="list-disc"&gt;<br/>
+                    <span class="ml-4">&lt;void @tag="li"</span> <br/>
+                    <span class="ml-8">@separator="|"</span><br/>
+                    <span class="ml-8"/>    @tag-class="text-rose-600"&gt;</span><br/>
+                    <span class="ml-8"/>One|Two|Three|Four|Five</span><br/>
+                    <span class="ml-4"/>&lt;/void&gt;</span><br/>
+                    <span class=""/>&lt;ul&gt;</span>
+                </div>
+                <div class="example">
+                    <ul class="list-disc">
+                        <void @tag="li" @separator="|" @tag-class="text-rose-600">
+                            One|Two|Three|Four|Five
+                        </void>
+                    </ul>
+                </div>
+            </div>
+            <p>The <code class="code"> @tag-&lt;AttrName&gt;</code>attribute can be used to apply any attribute to the generated elements
+                where <i> AttrName</i> is the name of the attribute that should be generated.</p><br/>
+            <p>It is possible to include tags as part of the list of items to generate from. The
+                <code class="code">wrap-all</code> command must be included in the parent tag.
+                Note that separators are <b> NOT</b> used around tags. The separators in the example are highlighted in green to help show this.</p>
+            <div class="p-4 bg-slate-300 mt-4 flex gap-10">
+                <div>
+                    &lt;div @separator="|"<br/>
+                    <span class="ml-10">@wrap-all</span><br/>
+                    <span class="ml-10">@tag-class="inline-block text-orange-600 border"&gt;</span><br/>
+                    <span class="ml-4">One&lt;b&gt;bold&lt;/b&gt;step<b class="text-green-700"> | </b> in<b class="text-green-700"> |</b> time.</span><br/>
+                    &lt;/div&gt;
+                </div>
+                <div class="example"
+                     @separator="|" @wrap-all
+                     @tag-class="inline-block text-orange-600 border"
+                @tag-id="box#">
+                    One<b>bold</b>step|in|time.
+                </div>
+            </div>
+        </div>
+    </Row>
+</div>

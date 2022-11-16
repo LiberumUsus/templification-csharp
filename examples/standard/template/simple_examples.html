@@ -1,0 +1,79 @@
+<div>
+<ExampleSection>
+  <div slot="title">Simple Button Template</div>
+  <div slot="code" class="text-black">
+    <h3>Source Html</h3>
+    &lt;Button&gt;Default Class&lt;/Button&gt;<br/>
+    &lt;Button class%o='btn text-blue-700'&gt;Class Change&lt;/Button&gt;<br/><br/>
+    <h3>Template Html</h3>
+    &lt;style&gt;<br/>
+    &nbsp;.btn {<br/>
+    &nbsp;&nbsp;@apply my-2 p-10px rounded-20 cursor-pointer;<br/>
+    &nbsp;&nbsp;border: 1px solid gray;<br/>
+    &nbsp;}<br/>
+    &lt;/style&gt;<br/>
+    <br/>
+    &lt;input class="btn text-white" type="button" value={default}/&gt;
+
+  </div>
+  <div slot="example">
+      <Button>Default Class</Button>
+      <Button class%o='btn text-blue-700'>Class Change</Button>
+  </div>
+</ExampleSection>
+
+<ExampleSection>
+  <div slot="title">Type Selector Template</div>
+  <div slot="code" class="text-black">
+    <h3>Source Html</h3>
+    &lt;Button&gt;Default Class&lt;/Button&gt;<br/>
+    &lt;Button type='link'&gt;Link Type&lt;/Button&gt;<br/><br/>
+    <h3>Template Html</h3>
+    &lt;style&gt;<br/>
+    &nbsp;.btn {<br/>
+    &nbsp;&nbsp;@apply my-2 p-10px rounded-20 cursor-pointer;<br/>
+    &nbsp;&nbsp;border: 1px solid gray;<br/>
+    &nbsp;}<br/>
+    &nbsp;.btn-link {<br/>
+    &nbsp;&nbsp;background: #A7399A;<br/>
+    &nbsp;}<br/>
+    &lt;/style&gt;<br/>
+    <br/>
+    &#123;#if type = link&#125;<br/>
+    &lt;a class="btn btn-link"&gt;&#123;default&#125&lt;/a&gt;<br/>
+    &#123;:else&#125;<br/>
+    &lt;input class="btn" type="button" value=&#123;default&#125/&gt;<br/>
+    &#123;#endif&#125;
+
+  </div>
+  <div slot="example">
+      <Button>Default Class</Button>
+      <Button type="link">Link Type</Button>
+  </div>
+</ExampleSection>
+<ExampleSection>
+  <div slot="title">Multiple Template Example</div>
+  <div slot="code" class="text-black">
+    <h3>Source Html</h3>
+    &lt;FancyList&gt;<br/>
+    &nbsp;&lt;ListItem&gt;First&lt;/ListItem&gt;<br/>
+    &nbsp;&lt;ListItem class='ml-4'&gt;Second&lt;/ListItem&gt;<br/>
+    &nbsp;&lt;ListItem&gt;Third&lt;/ListItem&gt;<br/>
+    &lt;/FancyList&gt;<br/><br/>
+    <h3>FancyList.html Template Html</h3>
+    &lt;ul class='list-circle border border-gray p-1'&gt;&lt;/slot&gt;&lt;/ul&gt;<br/><br/>
+    <h3>ListItem.html Template Html</h3>
+    &lt;li class='border-b-1 border-rose-500'&gt;&lt;/slot&gt;&lt;/li&gt;<br/>
+
+  </div>
+  <div slot="example">
+      <List>
+          <div slot="items">
+              <li>First</li>
+              <li class="ml-4">Second</li>
+              <li>Third</li>
+          </div>
+      </List>
+  </div>
+</ExampleSection>
+</div>

@@ -1,0 +1,24 @@
+<style>
+ .has_round {
+     border-radius: 20px;
+ }
+</style>
+
+<script>
+
+</script>
+
+<div class="bg-slate-500">
+    <a class="bg-green-600 w-full block px-2 box-border">Rounded class passed to all children</a>
+    <div class="bg-blue-500 p-4 {cclass}">
+        <div class="bg-blue-600 p-4 {cclass}">
+            <div class="bg-blue-700 p-4 {cclass}">
+                <div class="bg-blue-800 p-4 {cclass}">
+                    <div class="bg-blue-900 text-white p-4 {cclass}">
+                        <slot/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

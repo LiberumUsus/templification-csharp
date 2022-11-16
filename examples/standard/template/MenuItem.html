@@ -1,0 +1,24 @@
+{#if type = section}
+<li class="section" >
+    <input type="checkbox" id="{id}"/>
+    <label for="{id}"><a>{default}</a></label>
+    <slot/>
+</li>
+{:elseif type = sectionlink}
+<li class="section flex items-center gap-2" >
+    <slot name="image"/>
+    <a href="javascript:void(0)">{default}</a>
+</li>
+{:elseif type = submenu}
+<ul id="{id}" class="submenu">
+    <slot/>
+</ul>
+{:elseif type = handsonlink}
+<li><a href="javascript:void(0)">{default}</a></li>
+{:elseif type = empty}
+<li><slot/></li>
+{:else}
+<li>
+    <slot name="image"/>
+    <a href="javascript:void(0)|{href}">{default}</a></li>
+{#endif}

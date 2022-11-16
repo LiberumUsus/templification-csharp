@@ -1,0 +1,11 @@
+<style>
+ .special-list {
+     @apply: list-circle border border-gray p-1;
+ }
+ .special-list li {
+     @apply: border-b-1 border-rose-500;
+ }
+</style>
+<ul class="special-list">
+    <slot name="items"></slot>
+</ul>

@@ -1,0 +1,23 @@
+<style>
+ .es h3 {
+     @apply font-bold;
+ }
+</style>
+
+<div>
+    <div depends="title" class="mt-4 px-4 bg-slate-300 maxw-250 border-trl-2 ml-2 border-slate-400 rounded-trtl-5">
+        <slot name="title"/>
+    </div>
+<div class="es flex flex-row border-2 border-slate-400 rounded-10">
+    <div class="p-4 border-r-2 border-gray-300">
+        <code class="bg-white">
+            <slot name="code"/>
+        </code>
+    </div>
+    <div class="p-4">
+        <h2 class="font-bold">Output</h2>
+        <hr class="mb-4" />
+        <slot name="example"/>
+    </div>
+</div>
+</div>

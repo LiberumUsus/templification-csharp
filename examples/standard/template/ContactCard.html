@@ -1,0 +1,48 @@
+<style>
+ @style-id 130;
+
+ .email {
+     @apply pt-2;
+     color: #993322;
+ }
+ .contact-card {
+     border: 1px solid gray;
+     max-width: 400px;
+     min-width: 300px;
+     border-radius: 20px;
+     box-shadow: 2px 2px 4px #77b698;
+ }
+ .address {
+     color: #4963F2;
+ }
+ .name {
+     margin-bottom: 5px;
+ }
+ .description {
+     @apply mt-2;
+ }
+</style>
+<article class="contact-card">
+	<h2 class="text-white font-bold bg-primary rounded-trtl-19 px-4 mb-2 py-2 {name-class}">
+		<slot name="named">
+			<span>All Defaults</span>
+		</slot>
+	</h2>
+    <div class="px-4 pb-4">
+        <slot name="content">
+	        <div {extra} class="address" {addr}>
+		        <slot name="address">100 Default Addr St.</slot>
+	        </div>
+	        <div class="email">
+		        <slot name="email"><span>default@addrs.comp</span></slot>
+	        </div>
+            <div depends="description" class="description">
+                <h3 class="font-600">Notes:</h3>
+                <slot name="description"></slot>
+            </div>
+            <div depends="footer" class="text-red-400 text-sm border-tr-2 border-rose-500 rounded-tr-10 mt-2">
+                <slot name="footer"/>
+            </div>
+        </slot>
+    </div>
+</article>

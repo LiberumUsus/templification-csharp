@@ -1,0 +1,81 @@
+<style>
+ .final-count p {
+     @apply font-normal absolute -b-10 -r-3 w-3/4 bg-rose-600 p-4 rounded-br-47;
+     @apply text-sm text-white font-bold uppercase;
+ }
+ .code {
+     @apply bg-slate-300 mx-2 italic;
+ }
+</style>
+<div>
+    <Row class="">
+        <div>
+            <Header type="h1" class="uppercase decoration-double">Generating Classes</Header>
+            <p>Classes can be generated based on preconfigured names with postfix patterns. A simple example would be
+                <code class="code">border-t-2</code> where a border will be applied on the top of the element with a 2px width.</p>
+            <p>The following element types are currently supported with their corresponding class attribute.</p>
+            <Header type="h2">Generated Classes: Simple px Value</Header>
+            <Grid @separator=":"
+                  @strict-delim
+                  @tag-type="handsonlink"
+                  @tag-class="italic p-2 text-slate-700"
+                  {cols}="130px auto 120px auto">
+                <b>'p'</b>:'padding':
+                <b>'p[tlbrxy]'</b>:'padding-&lt;direction&gt;':
+		        <b>'m'</b>:'margin':
+		        <b>'m[tlbrxy]'</b>:'margin-&lt;direction&gt;':
+		        <b>'h'</b>:'height':
+		        <b>'w'</b>:'width':
+		        <b>'t'</b>:'top':
+		        <b>'l'</b>:'left':
+		        <b>'r'</b>:'right':
+		        <b>'b'</b>:'bottom':
+		        <b>'underline'</b>:'text-underline-offset':
+		        <b>'maxw'</b>:'max-width':
+		        <b>'gap'</b>:'gap'
+            </Grid>
+            <Header type="h3">Negative Values</Header>
+            <p>Add a <code class="code">-</code>before any class name to generate a negative value of the same.</p>
+            <p>i.e.: <code class="code">-t-2</code>generates a position from the top with a negative value.</p>
+            <Header class="mt-4" type="h2">Generated Classes: Directions</Header>
+            <Grid @separator=":"
+                  @strict-delim
+                  @tag-type="handsonlink"
+                  @tag-class="italic p-2 text-slate-700 font-bold"
+                  {cols}="50px auto">
+		        't': 'top':
+		        'b': 'bottom':
+		        'l': 'left':
+		        'r': 'right':
+		        'x': 'left|right'<div class="text-sm text-rose-500">&lt;-Not Implemented</div>:
+		        'y': 'top|bottom'<div class="text-sm text-rose-500">&lt;-Not Implemented</div>:
+            </Grid>
+            <Header class="mt-4" type="h2">Generated Classes: px Value and using Directions</Header>
+            <Grid @separator="|"
+                  @tag-type="handsonlink"
+                  @tag-class="italic p-2 text-slate-700 font-bold"
+                  {cols}="140px 40px auto">
+		        'border-#'     | --&gt; |'border-width: #px'|
+		        'border-tb-#'  | --&gt; |'border-top-width: #px'|
+		                       | --&gt; |'border-bottom-width: #px'|
+		        'rounded'      | --&gt; |'border-radius: 1px'|
+		        'rounded-#'    | --&gt; |'border-radius: #px'|
+		        'rounded-tr-#' | --&gt; |'border-top-right-radius: #px'
+            </Grid>
+        </div>
+    </Row>
+    <div class="flex justify-center tp m-10">
+        <div class=""
+            <div class="border-2 p-10 bg-peru">
+                <h3 class="font-bold text-azure uppercase underline bg-AA85B4">Background color value set</h3>
+                <p><span class="underline">This is  .</span><span class="overline">some text  .</span> <b>for boldness</b></p>
+                <p class="p-4 bg-gray rounded-10">Rounds value set, padding no</p>
+            </div>
+            <div class="final-count text-xl font-bold rounded-br-50 border-rb-3 border-indigo-400 p-4 mx-2 relative">
+                Rounded is fun!
+                <p>Neg pos generation</p>
+            </div>
+            <p class="border-green-500 border-2 border-solid italic p-4">Italic Text Inside!</p>
+            <RussianDoll type="rounded" {cclass}="has_round" class="mx-4">Using internal class</RussianDoll>
+        </div>
+    </div>

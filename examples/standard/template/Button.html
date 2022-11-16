@@ -1,0 +1,25 @@
+<style>
+ .btn {
+     padding: 10px;
+     border-radius: 20px;
+     border: none;
+     font-weight: bold;
+     cursor: pointer;
+ }
+ .btn-primary-1 {
+     background: #A7399A;
+ }
+ .btn-primary-2 {
+     background: #4499A5;
+     @global true;
+ }
+ .btn-neutral {
+     background: #a8a8a8;
+ }
+</style>
+
+{#if type = link}
+<a class="btn btn-primary-1">{default}</a>
+{:else}
+<input class="btn" type="button" value={default}/>
+{#endif}

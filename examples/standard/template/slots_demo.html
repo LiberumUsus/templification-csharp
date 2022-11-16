@@ -1,0 +1,65 @@
+<style>
+ .btn-primary-1 {
+     background: #aE5a04;
+     padding: 10px;
+     @global true;
+ }
+ .bordered {
+     border: 3px solid #444;
+ }
+ .btn {
+     padding: 10px;
+     border-radius: 20px;
+     color: white;
+     cursor: pointer;
+     text-decoration: underline;
+ }
+ .article {
+ }
+</style>
+<div>
+    <div class="myflex mt-10 box-border">
+        <!-- ALL DEFAULTS -->
+        <ContactCard/>
+        <!-- ALL REPLACED -->
+        <ContactCard {addr}="enabled">
+	        <span id="hello" slot="named" class%t="btn-primary-2">Custom Name</span>
+            <div slot="content" class="maxw-250">
+                <h2>All content replaced</h2>
+                <p>Via "content" slot</p>
+                Max width set via content class
+                Styles seem wrong... but maybe not
+            </div>
+        </ContactCard>
+        <!-- ALL USED -->
+        <ContactCard {addr}="enabled" {name-class}="bg-gray-400">
+	        <span id="hello" onclick="say_hello(this)" slot="named">
+                <Button {default}="P. Sherman" class%t="btn-primary-1 bordered btn">Hello</Button>
+            </span>
+	        <p slot="address" {extra}="www.google.com">
+		        42 Wallaby Way<br>
+		        Sydney
+	        </p>
+            <span id="hmail" slot%s="email">component@styles.here</span>
+            <div slot="description" class="text-sm">Name replaced with button, not just text</div>
+            <div slot="footer">*Footer is present</div>
+        </ContactCard>
+    </div>
+    <div class="myflex mt-10 box-border">
+        <!-- SOME USED -->
+        <ContactCard {name-class}="bg-gradient-to-r from-slate-700 via-slate-500 to-slate-400" class="bg-gradient-to-r from-green-500 via-cyan-300 to-gray-200">
+	        <span slot="named" class="">Multiple Elems to Single Slot</span>
+	        <p slot="address" class="text-slate-700">100 Address 1 from elem 1</p>
+	        <p slot="address" class="text-slate-700">200 Address 2 from elem 2</p>
+            <Email>replaced@by.tagname</Email>
+            <div slot="footer" class="text-indigo-600">Class color override</div>
+        </ContactCard>
+        <!-- DIFFERENT -->
+        <ContactCard>
+	        <span slot="named" class="">Slot Replacement</span>
+	        <p slot%s="address">100 Address 1 from elem 1</p>
+            <Email>replaced@by.tagname</Email>
+            <Email>replaced@by.tagname.twice</Email>
+        </ContactCard>
+    </div>
+</div>

@@ -1,0 +1,88 @@
+<style>
+ @font-face {
+     font-family: "Tangerine-Regular";
+     src: url("/content/fonts/Tangerine-Regular.ttf") format("truetype");
+     @global true;
+ }
+
+ @font-face {
+     font-family: "DancingScript-Variable";
+     src: url("/content/fonts/DancingScript-Variable.ttf") format("truetype");
+     font-stretch: 50% 200%;
+     @global true;
+ }
+
+ @font-face {
+     font-family: "DancingScript-Regular";
+     src: url("/content/fonts/DancingScript-Regular.ttf") format("truetype");
+     @global true;
+ }
+
+ .font-dancing-regular {
+     font-family: dancingscript-variable;
+     font-variation-settings: 'GRAD' 88;
+     font-weight: 125 950;
+     font-style: normal;
+     @global true;
+ }
+
+ .font-tangerine-regular {
+     font-family: tangerine-regular;
+     font-variation-settings: 'GRAD' 88;
+     font-weight: 125 950;
+     font-style: normal;
+     font-size: 2.0rem;
+     line-height: 1.8rem;
+     @global true;
+ }
+
+ .paper {
+     @apply bg-antiquewhite minh-400;
+     @apply border-2 border-tl-gray-400 border-br-gray-600;
+     @apply m-4 p-11 color-slate-800;
+     @apply shadow-lg shadow-blue;
+     @apply rounded-trbl-10;
+     box-shadow: 0 10px 15px -3px #9EC3EC, 0 4px 6px -4px #70a0e0;
+ }
+ .standardp-font {
+     @apply my-4;
+     font-family: dancingscript-variable, cursive;
+     font-variation-settings: 'GRAD' 50;
+     font-weight: 350;
+     word-spacing: 10px;
+     font-style: regular;
+     line-height: 1.6rem;
+     font-size: 1.5rem;
+ }
+ .holes {
+     position: absolute;
+     left: 10px;
+     height: 25px;
+     width: 25px;
+     background: lightgoldenrodyellow;
+     border-radius: 50%;
+     box-shadow: inset 0px 0px 2px 0px #888;
+ }
+ .lines {
+     margin-top: 40px;
+     height: calc(100% - 40px);
+     background-image: repeating-linear-gradient(white 0px, white 26px, steelblue 27px);
+ }
+ .lines-font {
+     line-height: 27px;
+     font-size: 26px;
+ }
+ .lines .standardp-font {
+     line-height: 26px;
+     font-size: 25px;
+     margin: 0;
+ }
+</style>
+
+<div class="paper relative">
+  <div class="absolute r-0 t-0 text-burlywood px-4 pt-3px {date-class}"
+       style="font-family: initial; font-size: 14px; font-weight:bold; word-spacing:initial;">
+        PUBLISHED ON A "PAPER" TEMPLATE: {:DATE:|date}
+    </div>
+    <slot class="" />
+</div>

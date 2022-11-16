@@ -1,0 +1,34 @@
+<style>
+ .title {
+     @apply font-bold text-primary-2 uppercase w-150 inline-block;
+ }
+</style>
+<div class="border-2 border-rose-700 flex-grow py-6 px-10 rounded-trbl-50 rounded-tlbr-10 border-l-indigo-600 border-r-orange-600 border-rl-5">
+    <Header type="h1" class="text-rose-600">TODOs</Header>
+    <ul class="list-square ml-4"
+        @strict-delim
+        @separator="|"
+        @tag ="li">
+        Update the todo page, it's out of date|
+        Change the styles page, its too stylish... and very confusing
+    </ul>
+
+  <Header type="h1" class="mt-4">Features In Progress</Header>
+    <ul class="list-square ml-4" @strict-delim @separator="|" @tag="li">
+        Option to bundle CSS into separate files |
+        Bubble up slots to first template level|
+        <span class="title">Logic Blocks</span><ul class="list-circle ml-4" @separator="\n" @tag="li">IF / ELSEIF / ENDIF
+            Match
+            Repeat
+            Counter
+        </ul>
+    </ul>
+    <Header type="h1" class="text-orange-800 mt-4">Documentation Missing</Header>
+    <ul class="list-square ml-4" @strict-delim @separator="|" @tag="li">
+        Slot documentation | Variable Documentation | Logic Blocks
+    </ul>
+    <Header type="h1" class="text-purple-800 mt-4">Code Improvements</Header>
+    <ul class="list-square ml-4" @strict-delim @separator="|" @tag="li">
+        Turn off the lightning! Its a frankenstein monster.
+    </ul>
+</div>

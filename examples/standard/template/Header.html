@@ -1,0 +1,17 @@
+<style>
+ .base-header {
+     @apply text-primary-2 font-bold my-2;
+ }
+ .underlined {
+     @apply underline underline-4;
+ }
+</style>
+{#if type = h1}
+<h1 class="text-2xl base-header underlined decoration-double">{default}</h1>
+{#elseif type = h2}
+<h2 class="text-xl base-header underlined">{default}</h2>
+{#elseif type = h3}
+<h3 class="text-lg base-header">{default}</h3>
+{#elseif type = h4}
+<h4 class="text-md base-header">{default}</h4>
+{#endif}
