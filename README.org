@@ -1,16 +1,61 @@
 #+TITLE: Templification
 #+AUTHOR: LiberumUsus
 
-* Commentary
-  This code is bad... its really ugly. I'm not proud of it, but it does it's job. One day (meaning probably never) I'll fix the code and make it beautiful.
+* Forward
+  The code is bad, mostly bad, well its ugly. I'm not proud of it, but it does it's job. One day (meaning probably never) I'll fix the code and make it beautiful.
+
+* Reasoning
+  - We love svelte
+  - We love Tailwindcss
+  - We hate... HATE... nodejs
+  - We dislike frameworks in general
+  - We greatly greatly dislike dependencies
+  - The original code was written in the V language... we really like V, but V is still fairly young and things kept breaking. 
+       *Note: V is much farther along as of recently
+  - We want to have framework like capabilities to create static webpages... because its cool!
+  
+* Purpose
+  The purpose of templification is the following
+  1) Create static web pages from a html templates
+  2) Autogenerate CSS based on class names like Tailwindcss 
+    E.G. 
+    #+begin_src 
+    bg-blue-800 => background: #3b82f6;
+    my-4        => margin-top: 1rem;margin-bottom: 1rem;
+    font-bold   => font-weight: 700;
+    #+end_src
+  3) Bundle up CSS and JS
+  4) One magical day minimize CSS and JS
+  5) ... do whatever amazing thing we can think of
+  6) Do all this inside a single, beautiful executable with no dependencies. (This sadly... is not totally the case due to moving to C#... but one day)
 
 * Usage
-  For now, unfortunately, you will just have to clone the repo and inspect the example files to see how it works.
+** Input and Template examples
+  
+  For now, unfortunately, you will just have to clone the repo and inspect the example files to see how it works in detail.
 
 
-  - Simple Run Down
-    Here is the very very basic concept.
+** Command Line Options
+#+begin_src
+-basedir   (-b) : The, base directory for all others; [default './examples']
+-output    (-o) : Directory, for the output files to be saved. It [default 'BASEDIR/bin']
+-template  (-t) : Directory, to be searched to find templates. [default 'BASEDIR/template']
+-input     (-i) : Directory, in which the source files to be compiled are located. [default 'BASEDIR/src']
+-extension (-x) : Output, filename extension, [default .html]
+-out_css        : Path, to the css output file. [default 'OUTPUT/bundle.css']
+-out_js         : Path, to the js output file. [default 'OUTPUT/bundle.js']
+-css_in         : Path, to the css input files
+-style-dir      : Location, of style files
+-debug     (-d) : Show, debug messages
+-test           : Don"t, create files just do test
+-help      (-h) : Show, this help
+#+end_src
 
+
+** Simple Run Down
+  
+  Here is the basic idea pulled from source comments.
+    #+begin_src
     ════════════════════════════════════════════════════════════════════
       _____ ___ __  __ ___ _    ___ ___ ___ ___   _ _____ ___ ___  _  _
      |_   _| __|  \/  | _ \ |  |_ _| __|_ _/ __| /_\_   _|_ _/ _ \| \| |
@@ -35,3 +80,4 @@
      \--\- OutDir\
                   \- output.html <body><div class="header">Hello</d...
     ════════════════════════════════════════════════════════════════════
+    #+end_src
