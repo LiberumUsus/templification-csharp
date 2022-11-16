@@ -237,11 +237,15 @@ namespace Templification.Styles {
             return rule_map;
         }
 
-        public static void generate_generatable(StyleSheet master, Dictionary<string,bool> class_list , string styledir) {
+        public static void generate_generatable(StyleSheet master, Dictionary<string,bool> class_list, CmdLineOptions cmd_options) {
             var gen_list  = new StyleGenerator();
-            gen_list.style_map = populate_stylemap_from_strings(styledir);
+            var styledir  = cmd_options.style_dir;
+            // #TODO: Consider more flexible loading of style files
+            var color_file = cmd_options.color_file;
+            var rules_file = cmd_options.rules_file;
+            gen_list.style_map = populate_stylemap_from_strings(styledir, rules_file);
 
-            populate_simple_maps(gen_list, styledir);
+            populate_simple_maps(gen_list, styledir, color_file);
             foreach (var kp in class_list ) {
                 if (!kp.Value) {
                     generate_class(kp.Key, master, gen_list);
@@ -336,11 +340,11 @@ namespace Templification.Styles {
             return is_hex;
         }
 
-        static Dictionary<string,List<Rule>> populate_stylemap_from_strings(string style_dir) {
-            var lregex    = new Regex(@"\w+");
+        static Dictionary<string,List<Rule>> populate_stylemap_from_strings(string style_dir, string file_name) {
+            var lregex    = new Regex(@"\s+");
             var style_map = new Dictionary<string,List<Rule>>();
 
-            var css_content = File.ReadAllLines(style_dir + "rules.txt");
+            var css_content = File.ReadAllLines(style_dir + file_name);
             if (css_content.Length <= 0 ) {
                 return style_map;
             }
@@ -357,7 +361,7 @@ namespace Templification.Styles {
                 if (key_rule.Length <= 1 ) {
                     continue;
                 }
-                foreach (var srule in key_rule[1].Split(";") ) {
+                foreach (var srule in key_rule[1].Trim().Split(";") ) {
                     if (srule.Length > 0 ) {
                         rules.Add(new Rule{
                                 key = srule.AllBefore(":").Trim(),
@@ -372,9 +376,9 @@ namespace Templification.Styles {
             return style_map;
         }
 
-        static void populate_simple_maps(StyleGenerator gen_list, string style_dir) {
-            // #TODO: Replace with actual implementation
-            var css_content  = File.ReadAllLines(style_dir + "colors.txt");
+        static void populate_simple_maps(StyleGenerator gen_list, string style_dir, string color_file) {
+            // #TODO: Replace with better/actual implementation
+            var css_content  = File.ReadAllLines(style_dir + color_file);
             if (css_content.Length <= 0 ) {
                 return;
             }

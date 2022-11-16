@@ -21,6 +21,8 @@ namespace Templification {
         public string template_dir   = "";
         public string out_ext        = "";
         public string style_dir      = "";
+        public string rules_file     = "";
+        public string color_file     = "";
         public bool   test_mode      = false;
         public bool   auto_make_dirs = false;
     }

@@ -197,13 +197,13 @@ namespace Templification.Styles {
 
         // MERGE STYLESHEETS, STRIP UNUSED CLASSES, GENERATE GENERATABLE CLASSES
         // AND APPLY APPLIES
-        public StyleSheet polish_style_sheets(Dictionary<string,StyleSheet> all_sheets , StyleSheet master, Dictionary<string,bool> class_list , string style_dir) {
+        public StyleSheet polish_style_sheets(Dictionary<string,StyleSheet> all_sheets , StyleSheet master, Dictionary<string,bool> class_list , CmdLineOptions cmd_options) {
             // APPLY APPLIES
             master.apply_applies();
             // STRIP UNUSED CLASSES
             separate_classes(master, class_list);
             // GENERATE GENERATIBLE
-            StyleGenerator.generate_generatable(master, class_list, style_dir);
+            StyleGenerator.generate_generatable(master, class_list, cmd_options);
             // MERGE ALL SHEETS
             foreach (var ssheet in all_sheets.Values ) {
                 master.merge(ssheet);

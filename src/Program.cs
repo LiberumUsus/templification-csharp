@@ -125,6 +125,22 @@ namespace Templification {
                 display_in_help = true
             };
 
+            var rulefile_flag  = new  CLI.CLIFlag {
+                flag = "string",
+                name = "rules-file",
+                description = "Name of rules file",
+                default_value = new string[]{"css_rules.txt"},
+                display_in_help = true
+            };
+
+            var colorfile_flag  = new  CLI.CLIFlag {
+                flag = "string",
+                name = "color-file",
+                description = "Name of colors file",
+                default_value = new string[]{"colors.txt"},
+                display_in_help = true
+            };
+
             var to_run  = new  CLI.CLIFlag {
                 flag = "string",
                 abbrev = 'm',
@@ -173,6 +189,8 @@ namespace Templification {
             app.AddFlag(out_js_flag);
             app.AddFlag(css_in_flag);
             app.AddFlag(styledir_flag);
+            app.AddFlag(colorfile_flag);
+            app.AddFlag(rulefile_flag);
 
             //════════════════════════════════════════════════════════════════════
             // Add commandline options that are ONLY available for default command
@@ -262,15 +280,19 @@ namespace Templification {
 
 
             // Create new crawldata object for templification operations
+            // #TODO: Need a better way to convert command line args into args
+            //        variable for the rest of the code
             var cmd_line_flags  = new  CmdLineOptions {
-                in_dir = in_path,
-                template_dir = template_path,
-                style_dir = style_dir,
-                css_dir = css_in,
-                out_css = out_css,
-                out_ext = ext,
-                out_js = out_js,
-                out_dir = out_path,
+                in_dir         = in_path,
+                template_dir   = template_path,
+                style_dir      = style_dir,
+                css_dir        = css_in,
+                out_css        = out_css,
+                out_ext        = ext,
+                out_js         = out_js,
+                out_dir        = out_path,
+                color_file     = cmd.GetString("color-file", "colors.txt"),
+                rules_file     = cmd.GetString("rules-file", "css_rules.txt"),
                 auto_make_dirs = cmd.GetBool("autocreate_dirs"),
             };
 
