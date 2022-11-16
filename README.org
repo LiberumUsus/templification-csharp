@@ -45,18 +45,21 @@ likely remain regardless of the eventual port back to a language that has minima
 
 ** Command Line Options
 #+begin_src
--basedir   (-b) : The, base directory for all others; [default './examples']
--output    (-o) : Directory, for the output files to be saved. It [default 'BASEDIR/bin']
--template  (-t) : Directory, to be searched to find templates. [default 'BASEDIR/template']
--input     (-i) : Directory, in which the source files to be compiled are located. [default 'BASEDIR/src']
--extension (-x) : Output, filename extension, [default .html]
--out_css        : Path, to the css output file. [default 'OUTPUT/bundle.css']
--out_js         : Path, to the js output file. [default 'OUTPUT/bundle.js']
--css_in         : Path, to the css input files
--style-dir      : Location, of style files
--debug     (-d) : Show, debug messages
--test           : Don"t, create files just do test
--help      (-h) : Show, this help
+-basedir         (-b) : The, base directory for all others; [default './']
+-output          (-o) : Directory, for the output files to be saved. It [default 'BASEDIR/bin']
+-template        (-t) : Directory, to be searched to find templates. [default 'BASEDIR/template']
+-input           (-i) : Directory, in which the source files to be compiled are located. [default 'BASEDIR/src']
+-extension       (-x) : Output, filename extension, [default .html]
+-out_css              : Path, to the css output file. [default 'OUTPUT/bundle.css']
+-out_js               : Path, to the js output file. [default 'OUTPUT/bundle.js']
+-css_in               : Path, to the css input files
+-style-dir            : Location, of style files
+-color-file           : Name of colors file
+-rules-file           : Name of rules file
+-debug           (-d) : Show, debug messages
+-test                 : Don"t, create files just do test
+-autocreate_dirs (-a) : Automatically create output dirs
+-help            (-h) : Show, this help
 #+end_src
 
 
