@@ -1,0 +1,13 @@
+* Examples
+  Work in progress... probably buggy, might not all be correct... no warranties yet :D
+
+** Running
+   #+begin_src
+   ./templification -x html -a -b ./examples/standard -o <output path> -out_css <output path>/css/demo.css -style-dir ./examples/style_configs/
+
+   -a         <= Autocreate Output Directories
+   -b         <= Sets base directory
+   -o         <= Sets output directory
+   -out_css   <= Sets css output file/directory
+   -style-dir <= Sets directory containing colors.txt and css_rules.txt files
+   #+end_src
