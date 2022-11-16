@@ -39,11 +39,11 @@ namespace Templification.CLI {
             }
         }
 
-        public string GetString(string name) {
-            var outval = "";
+        public string GetString(string name, string or_default = "") {
+            var outval = or_default;
             if (string.IsNullOrEmpty(name)) return outval;
 
-            char flagref  = name[0];
+            char flagref = (name.Length == 0) ? name[0] : '\0';
             if (flags.ContainsKey(name)) {
                 outval = flags[name].value;
                 if (string.IsNullOrEmpty(outval)) outval = flags[name].default_value[0];

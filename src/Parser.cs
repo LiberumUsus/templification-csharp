@@ -16,8 +16,8 @@ namespace Templification {
             var master_sheet   = new StyleSheet();
             var master_text    = new List<TextData>();
 
-            FileStream css_bundle_file;
-            FileStream js_bundle_file;
+            FileStream? css_bundle_file;
+            FileStream? js_bundle_file;
 
             if (Utils.Utils.open_file_with_hand_holding(cmd_line_options.out_css,
                                                     out css_bundle_file,
@@ -32,6 +32,8 @@ namespace Templification {
                 return 0;
             }
 
+            // Double check and make sure filestreams are not null
+            if (css_bundle_file == null || js_bundle_file == null) return 0;
 
             // Default return value
             var file_count = (uint)crawl_files.input_files.Count;
@@ -125,7 +127,7 @@ namespace Templification {
             // Merge stylesheets, strip unused classes, generate generatable classes
             // and apply applies
             Console.WriteLine("[DEBUG] "+ "Polishing up CSS style sheet");
-            master_sheet = master_sheet.polish_style_sheets(crawl_files.css_files, master_sheet, master_classes, cmd_line_options.style_dir);
+            master_sheet = master_sheet.polish_style_sheets(crawl_files.css_files, master_sheet, master_classes, cmd_line_options);
 
             // Write CSS bundle file to css output path
             css_bundle_file.Write(Encoding.UTF8.GetBytes(master_sheet.str())) ; // or

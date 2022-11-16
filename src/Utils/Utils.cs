@@ -66,7 +66,7 @@ namespace Templification.Utils {
 
         // Attempt to open a file for writing and create path if necessary
         // based on user response or CLI arguments
-        public static int open_file_with_hand_holding(string path_to_file, out FileStream opened_file, CmdLineOptions options, string throwMessage = "") {
+        public static int open_file_with_hand_holding(string path_to_file, out FileStream? opened_file, CmdLineOptions options, string throwMessage = "") {
             FileAttributes fattribs = new FileAttributes();
             var path_exists = File.Exists(path_to_file);
             var dir_path    = Path.GetDirectoryName(path_to_file);
