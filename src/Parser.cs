@@ -19,18 +19,17 @@ namespace Templification {
             FileStream css_bundle_file;
             FileStream js_bundle_file;
 
-            try {
-                var dirPath = Path.GetDirectoryName(cmd_line_options.out_css);
-                Directory.CreateDirectory((string.IsNullOrEmpty(dirPath) ? "" : dirPath));
-                css_bundle_file = File.Open(cmd_line_options.out_css, FileMode.OpenOrCreate);
-            } catch {
-                throw new Exception("Cannot open css file: " + cmd_line_options.out_css);
+            if (Utils.Utils.open_file_with_hand_holding(cmd_line_options.out_css,
+                                                    out css_bundle_file,
+                                                    cmd_line_options,
+                                                    "Cannot open css file: " + cmd_line_options.out_css)  < 0) {
+                return 0;
             }
-
-            try {
-                js_bundle_file = File.Open(cmd_line_options.out_js, FileMode.OpenOrCreate);
-            } catch {
-                throw new Exception("Cannot open js file:" + cmd_line_options.out_js);
+            if (Utils.Utils.open_file_with_hand_holding(cmd_line_options.out_js,
+                                                    out js_bundle_file,
+                                                    cmd_line_options,
+                                                        "Cannot open js file: " + cmd_line_options.out_js) < 0) {
+                return 0;
             }
 
 

@@ -13,15 +13,16 @@ namespace Templification {
     // - Output directory for CSS files
     // - Etc.
     public class CmdLineOptions {
-        public string out_dir      = "";
-        public string out_css      = "";
-        public string out_js       = "";
-        public string in_dir       = "";
-        public string css_dir      = "";
-        public string template_dir = "";
-        public string out_ext      = "";
-        public string style_dir    = "";
-        public bool   test_mode    = false;
+        public string out_dir        = "";
+        public string out_css        = "";
+        public string out_js         = "";
+        public string in_dir         = "";
+        public string css_dir        = "";
+        public string template_dir   = "";
+        public string out_ext        = "";
+        public string style_dir      = "";
+        public bool   test_mode      = false;
+        public bool   auto_make_dirs = false;
     }
 
 
@@ -56,7 +57,7 @@ namespace Templification {
 
             // BAIL IF THE DIRECTORY DOESNT EXIST
             if (!Directory.Exists(crawl_directory)) {
-                Console.WriteLine("Directory does not exist :(");
+                Console.WriteLine("[ERROR] Input directory does not exist! " + crawl_directory);
                 return file_mapping;
             }
 

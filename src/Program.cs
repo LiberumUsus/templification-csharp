@@ -52,8 +52,8 @@ namespace Templification {
                 flag = "string",
                 abbrev = 'b',
                 name = "basedir",
-                default_value = new string[]{"./examples"},
-                description = "The, base directory for all others; [default './examples']",
+                default_value = new string[]{"./"},
+                description = "The, base directory for all others; [default './']",
                 display_in_help = true
             };
 
@@ -200,6 +200,14 @@ namespace Templification {
 
             app.AddFlag(new CLI.CLIFlag {
                     flag = "bool",
+                        name = "autocreate_dirs",
+                        abbrev = 'a',
+                        description = "Automatically create output dirs",
+                        display_in_help = true
+                        });
+
+            app.AddFlag(new CLI.CLIFlag {
+                    flag = "bool",
                         abbrev = 'h',
                         name = "help",
                         description = "Show, this help",
@@ -263,6 +271,7 @@ namespace Templification {
                 out_ext = ext,
                 out_js = out_js,
                 out_dir = out_path,
+                auto_make_dirs = cmd.GetBool("autocreate_dirs"),
             };
 
 
@@ -270,7 +279,6 @@ namespace Templification {
             //════════════════════════════════════════════════════════════════════
             // Begin templification and crawl directories
             var crawl_files  = crawler.crawl_directories(cmd_line_flags);
-            Console.WriteLine(crawl_files.input_files.Count);
             var parsed_files = (uint)0;
             try {
                 parsed_files = parser.parse_files(crawl_files, cmd_line_flags);
@@ -305,6 +313,7 @@ namespace Templification {
             Utils.Utils.print_tableln(" [INFO] JS OUT: "        + cmd_line_flags.out_js, new List<int>{22, -1}, ":");
             Utils.Utils.print_tableln(" [INFO] STYLE DIR: "     + cmd_line_flags.style_dir, new List<int>{22, -1}, ":");
             Utils.Utils.print_tableln(" [INFO] DB OUT DIR: "    + cmd_line_flags.out_dir + "/SiteInfo.sqlite", new List<int>{22, -1}, ":");
+            Utils.Utils.print_tableln(" [INFO] AUTO CREATE: "   + cmd_line_flags.auto_make_dirs, new List<int>{22, -1}, ":");
             Console.WriteLine("════════════════════════════════════════════════════════════════════\n\n");
         }
 

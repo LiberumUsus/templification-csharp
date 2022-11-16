@@ -60,7 +60,48 @@ namespace Templification.Utils {
 
     }
 
+
+
     public static class Utils {
+
+        // Attempt to open a file for writing and create path if necessary
+        // based on user response or CLI arguments
+        public static int open_file_with_hand_holding(string path_to_file, out FileStream opened_file, CmdLineOptions options, string throwMessage = "") {
+            FileAttributes fattribs = new FileAttributes();
+            var path_exists = File.Exists(path_to_file);
+            var dir_path    = Path.GetDirectoryName(path_to_file);
+
+            if (path_exists) fattribs = File.GetAttributes(path_to_file);
+
+            // Not a file... bork!
+            if (path_exists && !fattribs.HasFlag(FileAttributes.Normal)) {
+                opened_file = null;
+                return -1;
+            } else if (!path_exists) {
+                try {
+                    var make_dir = options.auto_make_dirs;
+
+                    if (!options.auto_make_dirs && !Directory.Exists(dir_path)) {
+                        Console.WriteLine("Create output directory? (y/n): " + dir_path);
+                        var response = Console.ReadLine();
+                        make_dir = (response == "y" || response == "Y");
+                    }
+                    if (make_dir) {
+                        Directory.CreateDirectory((string.IsNullOrEmpty(dir_path) ? "" : dir_path));
+                    }
+                } catch {
+                    opened_file = null;
+                    if (throwMessage != "") {
+                        throw new Exception(throwMessage);
+                    }
+                    return -2;
+                }
+
+            }
+            opened_file = File.Open(path_to_file, FileMode.OpenOrCreate);
+            return 0;
+        }
+
         // return the file stem of a file name or path to a file.
         // I.E. `/home/user/file.txt` would become `file`<br/>
         // and `just_a_file.txt` would become `just_a_file`

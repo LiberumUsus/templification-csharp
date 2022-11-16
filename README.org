@@ -1,25 +1,17 @@
 #+TITLE: Templification
 #+AUTHOR: LiberumUsus
 
-* Forward
-  The code is bad, mostly bad, well its ugly. I'm not proud of it, but it does it's job. One day (meaning probably never) I'll fix the code and make it beautiful.
+Templification was originally written in the V programming language. The desire is to have the program written in a language that is
+compiled to binary and does not depend on virtual machines or frameworks and as few libraries as possible. This translation/port will
+likely remain regardless of the eventual port back to a language that has minimal dependencies. It might even get prettied up at some point
+... but probably not.
 
-* Reasoning
-  - We love svelte
-  - We love Tailwindcss
-  - We hate... HATE... nodejs
-  - We dislike frameworks in general
-  - We greatly greatly dislike dependencies
-  - The original code was written in the V language... we really like V, but V is still fairly young and things kept breaking. 
-       *Note: V is much farther along as of recently
-  - We want to have framework like capabilities to create static webpages... because its cool!
-  
 * Purpose
   The purpose of templification is the following
   1) Create static web pages from a html templates
-  2) Autogenerate CSS based on class names like Tailwindcss 
-    E.G. 
-    #+begin_src 
+  2) Autogenerate CSS based on class names like Tailwindcss
+    E.G.
+    #+begin_src
     bg-blue-800 => background: #3b82f6;
     my-4        => margin-top: 1rem;margin-bottom: 1rem;
     font-bold   => font-weight: 700;
@@ -27,11 +19,27 @@
   3) Bundle up CSS and JS
   4) One magical day minimize CSS and JS
   5) ... do whatever amazing thing we can think of
-  6) Do all this inside a single, beautiful executable with no dependencies. (This sadly... is not totally the case due to moving to C#... but one day)
+  6) Do all this inside a single, beautiful executable with no dependencies.
+     (This sadly... is not totally the case due to moving to C#... but one day)
+
+
+* Note on code state
+  The code is bad, mostly bad, well its ugly. I'm not proud of it, but it does it's job. One day (meaning probably never) I'll fix the code and make it beautiful.
+  - NOTE:
+    The code is... shall we say, mostly stable. So, it might do something odd, no guarantees mate.
+
+* Reasoning / Why a single executable?
+  - We love svelte
+  - We love Tailwindcss
+  - We hate... HATE... nodejs
+  - We dislike frameworks in general
+  - We greatly dislike dependency hell
+  - The original code was written in the V language... we really like V, but things kept breaking (maybe we should write better code :( ).
+  - We want to have framework like capabilities to create static webpages, without the stinking framework.
 
 * Usage
 ** Input and Template examples
-  
+
   For now, unfortunately, you will just have to clone the repo and inspect the example files to see how it works in detail.
 
 
@@ -53,31 +61,25 @@
 
 
 ** Simple Run Down
-  
+
   Here is the basic idea pulled from source comments.
     #+begin_src
-    ════════════════════════════════════════════════════════════════════
-      _____ ___ __  __ ___ _    ___ ___ ___ ___   _ _____ ___ ___  _  _
-     |_   _| __|  \/  | _ \ |  |_ _| __|_ _/ __| /_\_   _|_ _/ _ \| \| |
-       | | | _|| |\/| |  _/ |__ | || _| | | (__ / _ \| |  | | (_) | .` |
-       |_| |___|_|  |_|_| |____|___|_| |___\___/_/ \_\_| |___\___/|_|\_|
-
-    ════════════════════════════════════════════════════════════════════
-    ════════════════════════════════════════════════════════════════════
-     Templification:
-     This program takes an html file(s) as a source, then scans it and
+     Templification takes an html file(s) as a source, then scans it and
      any number of template html files in a templates directory.
      It then produces output files based on the input files and the
      insertion of templates.
+
      E.G.
      \--\--\- Src\
          \        \- source.html <body><header/><widget><button>Click...
           \
            \- Templates\
-                        \- Button.html
+                        \- Header.html
                          - Widget.html
-                         - Header.html
+                         - Button.html
      \--\- OutDir\
                   \- output.html <body><div class="header">Hello</d...
-    ════════════════════════════════════════════════════════════════════
+                                       <div><h3>Amazing header</h3></...
+                                       <input type="button" ...
+
     #+end_src
