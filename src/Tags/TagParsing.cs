@@ -7,19 +7,19 @@ namespace Templification.Tags {
     public static class TagParsing {
 
         // Convert html int texto a TagTree
-        public static TagTree parse_html_to_tag_tree(string source) {
-            var tag_data  =  parse_html_to_tag_data(source);
+        public static TagTree parse_html_to_tag_tree(string source, CmdLineOptions options) {
+            var tag_data  =  parse_html_to_tag_data(source, options);
             return tag_array_to_tag_tree(tag_data, source);
         }
 
         //   Parse html int TagData texto
-        public static List<TagData> parse_html_to_tag_data(string source) {
+        public static List<TagData> parse_html_to_tag_data(string source, CmdLineOptions options) {
             var findex       =  0;
             var tag_groups   =  new List<TagGroup>();
             var pat_tag_any  =  "(\\s*<.*?>)";
             var any_ex  = new Regex(pat_tag_any, RegexOptions.Singleline); // or  panic(err)
 
-            var special_groups = collect_preprocess_blocks(source);
+            var special_groups = collect_preprocess_blocks(source, options);
             var sub_source = "";
             var c_groups = new List<TagGroup>();
             for (var i = 0; i < (special_groups.Count / 2); i++) {
@@ -81,11 +81,13 @@ namespace Templification.Tags {
             };
 
             var was_matched  = false;
-            if (!was_matched) was_matched = attempt_match(TagType.start,  script_start_ex, sub_source, tag);
-            if (!was_matched) was_matched = attempt_match(TagType.end,    script_end_ex,   sub_source, tag);
-            if (!was_matched) was_matched = attempt_match(TagType.single, single_ex,       sub_source, tag);
-            if (!was_matched) was_matched = attempt_match(TagType.start,  start_ex,        sub_source, tag);
-            if (!was_matched) was_matched = attempt_match(TagType.end,    end_ex,          sub_source, tag);
+            if (group.sub_type != TagSubType.cshtml) {
+                if (!was_matched) was_matched = attempt_match(TagType.start,  script_start_ex, sub_source, tag);
+                if (!was_matched) was_matched = attempt_match(TagType.end,    script_end_ex,   sub_source, tag);
+                if (!was_matched) was_matched = attempt_match(TagType.single, single_ex,       sub_source, tag);
+                if (!was_matched) was_matched = attempt_match(TagType.start,  start_ex,        sub_source, tag);
+                if (!was_matched) was_matched = attempt_match(TagType.end,    end_ex,          sub_source, tag);
+            }
 
             if (!was_matched && sub_source.Trim().Length > 0 ) {
                 // MAKE THIS SPLIT UP TEXT BASED ON COMMANDS AND CREATE TAGS FOR EACH
@@ -115,6 +117,18 @@ namespace Templification.Tags {
                     if  (index > 0) {
                         tag.new_line = "\n";
                     }
+                }
+            } else if (tag.sub_type == TagSubType.cshtml){
+                tag.tstr = sub_source;
+                tag.name = "text";
+                var tsub  =  sub_source.ToLower();
+                if (tsub.Contains("class")) {
+                    process_razor_cmd(sub_source, tag);
+                }
+                tag.tag_type = TagType.text;
+                var index  = sub_source.IndexOf("\n");
+                if  (index > 0) {
+                    tag.new_line = "\n";
                 }
             } else if (tag.tag_type != TagType.text ) {
                 if (group.start == 0 ) {
@@ -195,7 +209,6 @@ namespace Templification.Tags {
             var attrib_rgstr  = "([^\"= ]+)[=][{\"'][^\"]*['\"}]";
             var reggy = new Regex(attrib_rgstr) ; // or   new regex.RE();
             var int_locations = reggy.Matches(attribs);
-            //Console.WriteLine("AMATCH: "+int_locations.Count);
             var matches  =  Utils.Utils.match_strings_from_location_ints(int_locations.ToList(), attribs, true);
 
             if (matches.Count <= 0 ) {
@@ -341,7 +354,7 @@ namespace Templification.Tags {
         }
 
         // Parse a CSS file or style block
-        public static List<TagGroup> collect_preprocess_blocks(string source) {
+        public static List<TagGroup> collect_preprocess_blocks(string source, CmdLineOptions options) {
             var out_tags  =  new List<TagGroup>();
 
             var script_start =  "<script*>";
@@ -369,10 +382,10 @@ namespace Templification.Tags {
             cswatcher.init("cshtml", cs_start + " " + cs_end + " \\");
             cswatcher.useouter(true);
             cswatcher.insensitive = true;
-            cswatcher.reporting   = false;
+            cswatcher.reporting   = true;
+            cswatcher.active      = options.preprocess_razor;
 
             var watchers = new Watcher[]{swatcher, vwatcher, cswatcher};
-
             var i = 0;
             foreach (var chr in source ) {
                 foreach (var watch in watchers ) {
@@ -395,21 +408,21 @@ namespace Templification.Tags {
                             switch(watch.name) {
                                 case "script": {
                                     startlen = match_lens.b;
-                                    endlen = match_lens.d;
-                                    subtype = TagSubType.script;
+                                    endlen   = match_lens.d;
+                                    subtype  = TagSubType.script;
                                     break;
                                 }
                                 case "void": {
                                     startlen = match_lens.b;
-                                    endlen = match_lens.d;
-                                    subtype = TagSubType.void_exact;
+                                    endlen   = match_lens.d;
+                                    subtype  = TagSubType.void_exact;
                                     break;
                                 }
                                 case "cshtml": {
                                     if (!vwatcher.is_searching() ) {
                                         startlen = match_lens.b;
-                                        endlen = match_lens.d;
-                                        subtype = TagSubType.cshtml;
+                                        endlen   = match_lens.d;
+                                        subtype  = TagSubType.cshtml;
                                     } else {
                                         return out_tags;
                                     }

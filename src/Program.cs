@@ -5,12 +5,15 @@
 //       its not optimized for anything. but it works! :D
 
 
+using System.Text.RegularExpressions;
+
 namespace Templification {
 
     public class MainProg {
 
         static Crawler crawler = new Crawler();
         static Parser  parser  = new Parser();
+        static int     console_width = 60;
 
         //════════════════════════════════════════════════════════════════════
         //  _____ ___ __  __ ___ _    ___ ___ ___ ___   _ _____ ___ ___  _  _
@@ -46,6 +49,9 @@ namespace Templification {
         // It then produces output files based on the inputs and the
         // insertion of templates and options int insertedo the source html.
         static int Main(string[] args) {
+
+            // Set console width
+            console_width = Console.WindowWidth;
 
             // Command Line Flags for program commands
             var basedir_flag  = new CLI.CLIFlag {
@@ -203,10 +209,26 @@ namespace Templification {
                         });
 
             app.AddFlag(new CLI.CLIFlag {
+                    flag = "bool",
+                        name = "preprocess_razor",
+                        description = "Enable the preprocessing of razor files (beta) ..err (alpha)",
+                        display_in_help = true
+                        });
+
+            app.AddFlag(new CLI.CLIFlag {
                     flag = "string",
-                        abbrev = 'c',
+                        abbrev = 'e',
                         name = "testcode",
                         description = "Run, Code Tests... this should be removed.. why is it in production!!!?",
+                        });
+
+            app.AddFlag(new CLI.CLIFlag {
+                    flag = "string",
+                        abbrev = 'c',
+                        name = "config",
+                        description = "Set a location for the config file. !Any additional flags will override flags set in the config file!",
+                        display_in_help = true,
+                        default_value = new string[]{"templification.config"},
                         });
 
             app.AddFlag(new CLI.CLIFlag {
@@ -241,6 +263,13 @@ namespace Templification {
                 return 0;
             }
 
+            // Slightly weird parsing here... don't have a better way yet
+            if (app.GetString("config").Length > 0) {
+                Console.WriteLine("Processing config file");
+                process_config_file(app);
+            }
+
+            // Perform "Normal Operations" ... should be based on command setup, but ya...
             normal_operations(app);
 
             return 0;
@@ -250,8 +279,8 @@ namespace Templification {
 
         // Function called for normal operations performed by the program as opposed to tests or help etc.
         public static bool normal_operations(CLI.CLICommand cmd) {
-            var show_help  = cmd.GetBool("help") ; // or  false
-            var debug_mode = cmd.GetBool("debug") ; // or  false
+            var show_help  = cmd.GetBool("help");
+            var debug_mode = cmd.GetBool("debug");
 
             // Help is requsted run this command and nothing else.
             if (show_help) {
@@ -263,7 +292,7 @@ namespace Templification {
             var base_dir       =  cmd.GetString("basedir") ; // or  "examples"
             var in_path        =  get_cli_path(cmd, "input",     "src",        base_dir);
             var template_path  =  get_cli_path(cmd, "template",  "template",   base_dir);
-            var style_dir      =  get_cli_path(cmd, "style-dir", "./src/",     base_dir);
+            var style_dir      =  get_cli_path(cmd, "style-dir", "./src/",     base_dir,true);
             var css_in         =  get_cli_path(cmd, "css_in",    "src",        base_dir);
             var out_path       =  get_cli_path(cmd, "output",    "bin",        base_dir);
             var out_css        =  get_cli_path(cmd, "out_css",   "bundle.css", out_path);
@@ -296,9 +325,11 @@ namespace Templification {
                 out_dir        = out_path,
                 color_file     = cmd.GetString("color-file", "colors.txt"),
                 rules_file     = cmd.GetString("rules-file", "css_rules.txt"),
-                auto_make_dirs = cmd.GetBool("autocreate_dirs"),
+                test_mode        = cmd.GetBool("test"),
+                auto_make_dirs   = cmd.GetBool("autocreate_dirs"),
+                preprocess_razor = cmd.GetBool("preprocess_razor"),
+                debug_mode       = debug_mode
             };
-
 
             print_command_line_flags(cmd_line_flags, base_dir);
             //════════════════════════════════════════════════════════════════════
@@ -314,7 +345,11 @@ namespace Templification {
                 }
             }
 
-            Console.WriteLine("[INFO]  " + parsed_files + " Parsed Files :) ");
+            if (cmd_line_flags.test_mode) {
+                Console.WriteLine(" [INFO]  " + parsed_files + " Files pretended to be parsed [test-mode] :) ");
+            } else {
+                Console.WriteLine(" [INFO]  " + parsed_files + " Parsed Files");
+            }
             Console.WriteLine("\n══════════════════════ END OF LINE ═════════════════════════════════");
             return true;
         }
@@ -325,9 +360,9 @@ namespace Templification {
         // This does not produce an exhaustive list, just the "interesting"
         // settings.
         static void print_command_line_flags(CmdLineOptions cmd_line_flags, string base_dir) {
-            Console.WriteLine("\n════════════════════════════════════════════════════════════════════");
+            Console.WriteLine("\n " + new string('═', console_width-2));
             Console.WriteLine("                       FLAGS  ");
-            Console.WriteLine("════════════════════════════════════════════════════════════════════");
+            Console.WriteLine(" " + new string('═', console_width-2));
             Utils.Utils.print_tableln(" [INFO] BASEDIR: "       + base_dir, new List<int>{22, -1}, ":");
             Utils.Utils.print_tableln(" [INFO] OUT PATH: "      + cmd_line_flags.out_dir, new List<int>{22, -1}, ":");
             Utils.Utils.print_tableln(" [INFO] IN PATH: "       + cmd_line_flags.in_dir, new List<int>{22, -1}, ":");
@@ -339,15 +374,17 @@ namespace Templification {
             Utils.Utils.print_tableln(" [INFO] STYLE DIR: "     + cmd_line_flags.style_dir, new List<int>{22, -1}, ":");
             Utils.Utils.print_tableln(" [INFO] DB OUT DIR: "    + cmd_line_flags.out_dir + "/SiteInfo.sqlite", new List<int>{22, -1}, ":");
             Utils.Utils.print_tableln(" [INFO] AUTO CREATE: "   + cmd_line_flags.auto_make_dirs, new List<int>{22, -1}, ":");
-            Console.WriteLine("════════════════════════════════════════════════════════════════════\n\n");
+            Console.WriteLine(" " + new string('═', console_width-2));
+            Console.WriteLine("\n");
         }
 
 
 
         // return the path for the CLI flag prepending the `default` directory
         // when the path provided does not start with `./` or `/`
-        static string get_cli_path(CLI.CLICommand cmd, string flag_name, string defaultStr, string base_dir) {
+        static string get_cli_path(CLI.CLICommand cmd, string flag_name, string defaultStr, string base_dir, bool is_dir = false) {
             var out_value  = cmd.GetString(flag_name);
+            if (is_dir && !out_value.EndsWith('/')) out_value += "/";
             if (string.IsNullOrEmpty(out_value)) out_value = defaultStr;
             if (!out_value.StartsWith("/") && !out_value.StartsWith("./") ) {
                 out_value = base_dir + "/" + out_value;
@@ -355,6 +392,27 @@ namespace Templification {
             }
             return out_value;
         }
+
+
+
+        // Load options from file and parse them
+        static void process_config_file(CLI.CLICommand cmd) {
+            var base_dir   = cmd.GetString("basedir");
+            var configPath =  get_cli_path(cmd, "config", "", base_dir);
+            if (configPath.Length > 0 && File.Exists(configPath)) {
+                var configFileLines = File.ReadAllText(configPath).Split('\n');
+                var arg_str = "";
+                foreach (var line in configFileLines) {
+                    if (line.StartsWith("#")) continue;
+
+                    arg_str += line + " ";
+                }
+
+                arg_str = Regex.Replace(arg_str, @"\s+", " ");
+                cmd.Parse(arg_str.Trim().Split(" "));
+            }
+        }
+
 
     } // END CLASS
 } // END NAMESPACE

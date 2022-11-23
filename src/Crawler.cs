@@ -23,8 +23,11 @@ namespace Templification {
         public string style_dir      = "";
         public string rules_file     = "";
         public string color_file     = "";
-        public bool   test_mode      = false;
-        public bool   auto_make_dirs = false;
+        public string config_path    = "";
+        public bool   test_mode        = false;
+        public bool   debug_mode       = false;
+        public bool   auto_make_dirs   = false;
+        public bool   preprocess_razor = false;
     }
 
 
@@ -100,10 +103,10 @@ namespace Templification {
 
 
         // Crawl over the input and template directories, then create output files
-        public CrawlFiles crawl_directories(CmdLineOptions crawl_data ) {
-            var input_mapping    = crawl_and_load_files(crawl_data.in_dir);
-            var template_mapping = crawl_and_load_files(crawl_data.template_dir);
-            var css_stylesheets  = crawl_and_load_css(crawl_data.css_dir);
+        public CrawlFiles crawl_directories(CmdLineOptions options ) {
+            var input_mapping    = crawl_and_load_files(options.in_dir, options);
+            var template_mapping = crawl_and_load_files(options.template_dir, options);
+            var css_stylesheets  = crawl_and_load_css(options.css_dir);
 
             return new CrawlFiles(input_mapping, template_mapping, css_stylesheets);
         }
@@ -111,11 +114,11 @@ namespace Templification {
 
 
         // Load the input files and parse them
-        public Dictionary<string,TemplateData> crawl_and_load_files(string input_dir) {
+        public Dictionary<string,TemplateData> crawl_and_load_files(string input_dir, CmdLineOptions options) {
             var input_files = collect_files_by_ext(input_dir, "html");
             // LOAD TEMPLATE DATA
             foreach(var keyPair in input_files) {
-                keyPair.Value.load_and_parse_file();
+                keyPair.Value.load_and_parse_file(options);
             }
             return input_files;
         }

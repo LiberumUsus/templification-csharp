@@ -43,10 +43,10 @@ namespace Templification.Templates {
             this.template = File.ReadAllText(this.path);
         }
 
-        public void load_and_parse_file() {
+        public void load_and_parse_file(CmdLineOptions options) {
             // OPERATIONS
             this.template = File.ReadAllText(this.path);
-            this.tag_tree = TagParsing.parse_html_to_tag_tree(this.template);
+            this.tag_tree = TagParsing.parse_html_to_tag_tree(this.template, options);
             this.tag_tree.process_attrib_commands();
             this.tag_tree.index_commands();
             if (this.tag_tree.root.locate_default_attrib_merge_tag(0) > 0 ) {
