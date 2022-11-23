@@ -6,6 +6,31 @@ compiled to binary and does not depend on virtual machines or frameworks and as 
 likely remain regardless of the eventual port back to a language that has minimal dependencies. It might even get prettied up at some point
 ... but probably not.
 
+* Quick Instructions
+  #+begin_html
+    <details><summary>Building and Running Example</summary>   
+      <h3>build.sh or build.bat file commands</h3>
+        #+begin_src
+        ./build.sh
+        ./build.sh run
+        ./build.sh help
+        #+end_src
+      <h3>Building code</h3>
+        Just build the code
+        #+begin_src
+        cd ./src
+        dotnet build
+        #+end_src
+      <h3>Running Example</h3>
+        #+begin_src
+        cd ./src
+        dotnet run -- -b ../examples/standard -style-dir ../style_configs/
+        #+end_src
+        *NOTE: style-dir is in this case relative to the base directory "../examples/standard"<br/>
+        Output files are in ../examples/standard/bin/[demo.html, bundle.js, bundle.css]
+    </details>
+  #+end_html
+  
 * Purpose
   The purpose of templification is the following
   1) Create static web pages from a html templates
