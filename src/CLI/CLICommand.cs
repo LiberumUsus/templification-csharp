@@ -4,11 +4,12 @@
 
 namespace Templification.CLI {
     public class CLICommand {
+        public string                      name                 = "";
+        public string                      description          = "";
+        public bool                        arguments_have_error = false;
         public Func<CLICommand, bool>?     execute;
         public Dictionary<string, CLIFlag> flags;
         public Dictionary<char, string>    flag_refs;
-        public string                      name        = "";
-        public string                      description = "";
 
         public CLICommand() {
             name      = "";
@@ -85,17 +86,19 @@ namespace Templification.CLI {
 
 
 
-        public void Parse(string[] args) {
-            string arg, avalue;
-            int cmd_len;
+        public bool Parse(string[] args) {
+            int     cmd_len;
+            bool    skip_next = false;
+            bool    success   = true;
+            string  arg;
+            string  avalue;
             CLIFlag found_flag;
-            bool skip_next = false;
 
             cmd_len = args.Length;
             for (var n = 0; n < cmd_len; n++) {
                 arg = args[n];
                 //// SKIP NON SWITCH VALUES
-                if (arg[0] != '-' || skip_next) {
+                if (arg.Length <=0 || arg[0] != '-' || skip_next) {
                     skip_next = false;
                     continue;
                 }
@@ -104,16 +107,21 @@ namespace Templification.CLI {
                 //// SET THE FOUND FLAG
                 arg = GetFlag(arg.Substring(1), out found_flag);
                 if (!string.IsNullOrEmpty(found_flag.name)) {
-                    if (found_flag.flag == "string") {
+                    if (found_flag.flag == "string" && (n + 1) < args.Length) {
                         avalue = args[n + 1];
                         found_flag.value = avalue.Trim();
                         skip_next = true;
+                    } else if (found_flag.flag == "string" && (n + 1) >= args.Length) {
+                        found_flag.value          = null;
+                        this.arguments_have_error = true;
+                        success                   = false;
                     } else {
                         found_flag.value = "true";
                     }
                     flags[arg.Trim()] =  found_flag;
                 }
             }
+            return success;
         }
 
 
@@ -121,9 +129,10 @@ namespace Templification.CLI {
         public void execute_help() {
             CLIFlag found_flag;
             var keys = new List<string>();
+            var extra_indent = "";
 
             foreach (var key in flags.Keys) {
-                if (flags[key].display_in_help) {
+                if (flags[key].display_in_help || flags[key].value == null) {
                     keys.Add(key);
                 }
             }
@@ -132,6 +141,11 @@ namespace Templification.CLI {
             Console.WriteLine("");
             Console.WriteLine("COMMAND HELP");
             Console.WriteLine("");
+            if (this.arguments_have_error) {
+                Console.WriteLine("!! ERROR IN PROVIDED ARGUMENTS !!");
+                Console.WriteLine("'x' Marks missing value for argument(s)\n");
+                extra_indent = "  ";
+            }
             int maxLength = 0;
             foreach (var key in keys) {
                 maxLength = (key.Trim().Length > maxLength) ? key.Trim().Length : maxLength;
@@ -139,14 +153,17 @@ namespace Templification.CLI {
             foreach (var key in keys) {
                 if (key.Trim().Length == 0) continue;
                 found_flag = flags[key.Trim()];
-
-                if (found_flag.name.Trim().Length != 0) {
-                    var ldiff = maxLength - found_flag.name.Trim().Length;
+                var flagName = found_flag.name.Trim();
+                if (this.arguments_have_error) {
+                    extra_indent = (found_flag.value == null) ? "x " : "  ";
+                }
+                if (flagName.Length != 0) {
+                    var ldiff = maxLength - flagName.Length;
                     var padding = new string(' ', ldiff);
                     var abbrv = "     ";
                     if (found_flag.abbrev != 0) abbrv = " (-"+found_flag.abbrev+")";
 
-                    Console.WriteLine("-" + found_flag.name.Trim() + padding + abbrv+ " : "+found_flag.description);
+                    Console.WriteLine(extra_indent + "-" + flagName.Trim() + padding + abbrv+ " : "+found_flag.description);
                 }
             }
 

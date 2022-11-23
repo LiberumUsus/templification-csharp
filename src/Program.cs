@@ -236,7 +236,10 @@ namespace Templification {
             //app.setup();
 
             // Parse command line and run command bound functions
-            app.Parse(args);
+            if (!app.Parse(args)) {
+                app.execute_help();
+                return 0;
+            }
 
             normal_operations(app);
 
