@@ -9,6 +9,10 @@ namespace Templification {
 
     public class Parser {
 
+        static int _spindex = -1;
+        static char[] _spinArray = new char[] {'-','\\','|','/','-','\\','|'};
+        static char[] _progArray = new char[] {'[','#','.',']'};
+
         // Parse all of the files that were collected during the
         // crawling operation.
         public uint parse_files(CrawlFiles crawl_files, CmdLineOptions cmd_line_options) {
@@ -37,17 +41,21 @@ namespace Templification {
 
             // Default return value
             var file_count = (uint)crawl_files.input_files.Count;
-
+            var max_width  =  Console.WindowWidth - 35;
+            var index      = 0;
             // Loop over input files and insert templates
             foreach (var kp in crawl_files.input_files ) {
-                var fname = kp.Key;
+                var fname       = kp.Key;
                 var source_file = kp.Value;
-                var tag_tree  =  source_file.tag_tree;
+                var tag_tree    = source_file.tag_tree;
                 // new string variable to hold produced html
                 var output_html  =  "";
+                index++;
 
                 // Current file
-                Console.WriteLine("[DEBUG] "+ "INPUT NAME: " + fname);
+                if (cmd_line_options.debug_mode) {
+                    Console.WriteLine("[DEBUG] "+ "READING FILE: " + source_file.path);
+                }
 
                 // ════════════════════════════════════════════════════════════════════
                 // PARSING OF INPUT FILE WITH TEMPLATE FILES
@@ -102,11 +110,18 @@ namespace Templification {
                 var output_path =  cmd_line_options.out_dir + ifile_path;
 
                 // Test mode fake write or actual write below
-                if (cmd_line_options.test_mode ) {
-                    Console.WriteLine("[DEBUG] "+ "Making directories");
-                    Console.WriteLine("[DEBUG] "+ "Writing files");
+                if (cmd_line_options.test_mode && cmd_line_options.debug_mode) {
+                    Console.WriteLine(" [DEBUG] "+ "[test-mode]");
+                    Console.WriteLine(" [DEBUG] "+ "Writing files");
                 } else {
-                    Console.WriteLine("[DEBUG] "+ "Writing file: " + output_path);
+                    if (cmd_line_options.debug_mode) {
+                        Console.WriteLine(" [DEBUG] "+ "Writing file: " + output_path);
+                    } else {
+                        Console.SetCursorPosition(0, Console.CursorTop -1);
+                        Console.WriteLine(" [INFO] Processing: " + progDisplay(index, file_count, max_width));
+//                        Console.WriteLine(" [INFO] Processing: " + spinner());
+                    }
+
                     var strDirName = Path.GetDirectoryName(output_path);
                     if (!string.IsNullOrEmpty(strDirName)) Directory.CreateDirectory(strDirName);
                     var fwriter = new System.IO.StreamWriter(output_path);
@@ -117,8 +132,9 @@ namespace Templification {
                     //  return 1;
                     //}
                 } //<═══ END SECTION;
-
-                Console.WriteLine("[DEBUG] "+ "               <<< File Parsing Done\n");
+                if (cmd_line_options.debug_mode) {
+                    Console.WriteLine(" [DEBUG] "+ "               <<< File Parsing Done\n");
+                }
             } //<═══ END FILE LOOP;
 
             // ════════════════════════════════════════════════════════════════════
@@ -126,7 +142,7 @@ namespace Templification {
 
             // Merge stylesheets, strip unused classes, generate generatable classes
             // and apply applies
-            Console.WriteLine("[DEBUG] "+ "Polishing up CSS style sheet");
+            Console.WriteLine(" [INFO] "+ "Polishing up CSS style sheet");
             master_sheet = master_sheet.polish_style_sheets(crawl_files.css_files, master_sheet, master_classes, cmd_line_options);
 
             // Write CSS bundle file to css output path
@@ -178,6 +194,31 @@ namespace Templification {
             var new_path  =  file_path.StartsWith(input_dir) ? file_path.Substring(input_dir.Length) : file_path;
             new_path = new_path.Replace("//", "/");
             return new_path.AllBefore(".") + "." + ext;
+        }
+
+
+        static string progDisplay(int index, uint count, int width) {
+            if (count < 0) return "??? eh?";
+            float percent = (index / (float)count);
+            var point     = (int)(percent * width);
+            var bar =  "" + _progArray[0];
+            var strcount =  "<" +index + ">";
+            if (index == count) {
+                bar += strcount + new string(_progArray[1], width-2);
+            } else {
+                point = (point - strcount.Length <= 0) ? 1 : point - strcount.Length;
+                bar += strcount;
+                bar += new string(_progArray[1], point);
+                bar += new string(_progArray[2], (width - point) - 2);
+            }
+            bar += _progArray[3];
+            return bar;
+        }
+
+        static char spinner() {
+            _spindex += 1;
+            if (_spindex >= _spinArray.Length) _spindex = 0;
+            return _spinArray[_spindex];
         }
 
 
