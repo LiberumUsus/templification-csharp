@@ -43,6 +43,9 @@ namespace Templification {
             var file_count = (uint)crawl_files.input_files.Count;
             var max_width  =  Console.WindowWidth - 35;
             var index      = 0;
+
+            if (max_width <= 0) max_width = 40;
+
             // Loop over input files and insert templates
             foreach (var kp in crawl_files.input_files ) {
                 var fname       = kp.Key;
@@ -117,9 +120,12 @@ namespace Templification {
                     if (cmd_line_options.debug_mode) {
                         Console.WriteLine(" [DEBUG] "+ "Writing file: " + output_path);
                     } else {
-                        Console.SetCursorPosition(0, Console.CursorTop -1);
-                        Console.WriteLine(" [INFO] Processing: " + progDisplay(index, file_count, max_width));
-//                        Console.WriteLine(" [INFO] Processing: " + spinner());
+                        if (Console.CursorTop-1 < 0) {
+                            Console.WriteLine(" [DEBUG] "+ "Writing file: " + output_path);
+                        } else {
+                            Console.SetCursorPosition(0, Console.CursorTop -1);
+                            Console.WriteLine(" [INFO] Processing: " + progDisplay(index, file_count, max_width));
+                        }
                     }
 
                     var strDirName = Path.GetDirectoryName(output_path);
@@ -203,6 +209,7 @@ namespace Templification {
             var point     = (int)(percent * width);
             var bar =  "" + _progArray[0];
             var strcount =  "<" +index + ">";
+
             if (index == count) {
                 bar += strcount + new string(_progArray[1], width-2);
             } else {
