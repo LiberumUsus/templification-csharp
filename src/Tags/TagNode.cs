@@ -347,8 +347,11 @@ namespace Templification.Tags {
 
             var index  = 0;
             foreach (var tclass in top_classes ) {
+                var mutTClass = tclass;
+                // REPLACE ENDING % SIGNS WITH "per"
+                if (mutTClass.EndsWith("%")) mutTClass = mutTClass.Substring(0,mutTClass.Length-1) + "per";
                 // RETAIN OR OPERATORS IN CLASSES UNTIL VARIABLE REPLACEMENT
-                var ptclasses = tclass.Split('|');
+                var ptclasses = mutTClass.Split('|');
                 for (int i = 0; i < ptclasses.Length; i++) {
                     var ptclass = ptclasses[i];
                     if (style_sheet.has_class(ptclass) ) {

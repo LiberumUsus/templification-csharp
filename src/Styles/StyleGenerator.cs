@@ -25,10 +25,24 @@ namespace Templification.Styles {
             {"x", "left|right"},
             {"y", "top|bottom"},
         };
+
+        // TODO: CAN PROBABLY DO AWAY WITH THIS AT SOME POINT
         public Dictionary<string,string> units = new Dictionary<string,string>{
             {"per", "%"},
             {"r", "rem"},
-            {"p", "px"}
+            {"p", "px"},
+            {"cm", "cm"},
+            {"mm", "mm"},
+            {"in", "in"},
+            {"pt", "pt"},
+            {"pc", "pc"},
+            {"em", "em"},
+            {"ex", "ex"},
+            {"ch", "ch"},
+            {"vw", "vw"},
+            {"vh", "vh"},
+            {"vmin", "vmin"},
+            {"vmax", "vmax"},
         };
         // MAKE THIS MORE PROGRAMATIC :/
         public Dictionary<string,string> oddities = new Dictionary<string,string>{
@@ -77,7 +91,7 @@ namespace Templification.Styles {
                             }}
                         },
                     new SubstNode {
-                        value = new List<string>{@"h-(?<value>\d+)(?<unit>-\S*)?"},
+                        value = new List<string>{@"h-(?<value>\d+)(?<unit>\S*)?"},
                             autounit = true,
                             rules = new List<Rule>{new Rule{
                                 key = "font-size",
@@ -129,7 +143,7 @@ namespace Templification.Styles {
                     }},
                 children = new List<GenNode>{
                     new SubstNode{
-                        value = new List<string>{@"^(?<dir>[tlrbxy]+)-(?<value>\d+)(?<unit>-\S*)?"},
+                        value = new List<string>{@"^(?<dir>[tlrbxy]+)-(?<value>\d+)(?<unit>\S*)?"},
                         rules = new List<Rule>{new Rule{
                                 key = "border-{dir}-radius",
                                     rvalue = "{value}"
@@ -137,7 +151,7 @@ namespace Templification.Styles {
                             pname = "rounded",
                     },
                     new SubstNode{
-                        value = new List<string>{@"^(?<value>\d+)(?<unit>-\S+)?"},
+                        value = new List<string>{@"^(?<value>\d+)(?<unit>\S+)?"},
                         rules = new List<Rule>{new Rule{
                                 key = "border-radius",
                                     rvalue = "{value}"
@@ -172,7 +186,7 @@ namespace Templification.Styles {
                                 }}
                         },
                     new SubstNode{
-                        value = new List<string>{@"^(?<dir>[tlrbxy]+)-(?<value>\d+)(?<unit>-\S*)?"},
+                        value = new List<string>{@"^(?<dir>[tlrbxy]+)-(?<value>\d+)(?<unit>\S*)?"},
                         rules = new List<Rule>{new Rule{
                                 key = "border-{dir}-width",
                                     rvalue = "{value}"
@@ -182,7 +196,7 @@ namespace Templification.Styles {
                             }}
                         },
                     new SubstNode{
-                        value = new List<string>{@"^(?<value>\d+)(?<unit>-\S+)?"},
+                        value = new List<string>{@"^(?<value>\d+)(?<unit>\S+)?"},
                         rules = new List<Rule>{new Rule{
                                 key = "border-width",
                                     rvalue = "{value}"
@@ -208,14 +222,14 @@ namespace Templification.Styles {
                     }},
                 children = new List<GenNode>{
                     new SubstNode{
-                        value = new List<string>{@"(?<dir>[tlrbxy]+)-(?<value>\d+)(?<unit>-\S*)?"},
+                        value = new List<string>{@"(?<dir>[tlrbxy]+)-(?<value>\d+)(?<unit>\S*)?"},
                         rules = new List<Rule>{new Rule{
                                 key = "{base}-{dir}",
                                 rvalue = "{value}"
                             }}
                         },
                     new SubstNode{
-                        value = new List<string>{@"(?<value>\d+)(?<unit>-\S+)?"},
+                        value = new List<string>{@"(?<value>\d+)(?<unit>\S+)?"},
                         rules = new List<Rule>{new Rule{
                                 key = "{base}",
                                 rvalue = "{value}"
@@ -280,6 +294,7 @@ namespace Templification.Styles {
                 baseclass = baseclass[1..];
             }
 
+            // IF THE NAME MATCHES EXACTLY A STYLE MAP USE IT
             if (gen_list.style_map.ContainsKey(cls)) {
                 out_class = new CClass {
                     names = new List<string>{"." + cls},
@@ -288,6 +303,7 @@ namespace Templification.Styles {
                 out_class.rules.AddRange(gen_list.style_map[cls]);
                 master.classes.Add(out_class);
             } else {
+                // CHECK IF STYLE IS GENERATABLE
                 var gnodes     = init_generator();
                 var first_name = baseclass.AllBefore("-");
 
@@ -300,8 +316,13 @@ namespace Templification.Styles {
                 if (gen_list.num_based.ContainsKey(first_name) ) {
                     first_name = "num_based";
                 }
+                // IF BASECLASS ENDS IN %, THEN % IS THE UNIT AND IT DOES NOT WORK IN CSS
+                // CHANGE IT TO "per" WHICH IS HANDLED IN THIS CODE
+                if (baseclass.EndsWith("%")) baseclass = baseclass.Substring(0,baseclass.Length-1) + "per";
+
                 var node  = gnodes.ContainsKey(first_name) ? gnodes[first_name] : new GenNode();
                 var rules = node.find_rules(baseclass, gen_list, is_negative);
+
                 if (rules.Count > 0 ) {
                     out_class = new CClass {
                         names = new List<string>{"." + cls},

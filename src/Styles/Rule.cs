@@ -28,6 +28,7 @@ namespace Templification.Styles {
 
         private string   Key;
         private string   Value;
+        public  bool     IsImportant = false;
         public  RuleType type = new RuleType();
 
         public string key {
@@ -54,7 +55,7 @@ namespace Templification.Styles {
         public string str() {
             //(self Rule)
             if (string.IsNullOrEmpty(this.key)) return "";
-            return this.key + " : "+ this.rvalue + ";";
+            return this.key + " : "+ this.rvalue + (this.IsImportant ? " !important" : "") + ";";
         }
 
         public void init(string rule) {
