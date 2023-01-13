@@ -103,7 +103,9 @@ namespace Templification {
                 // WRITING OUTPUT HTML
 
                 // Write collected javascript to bundle file
-                js_bundle_file.Write(Encoding.UTF8.GetBytes(tag_tree.bundle_scripts)); // or
+                if (tag_tree.bundle_scripts.Trim().Length > 0) {
+                    js_bundle_file.Write(Encoding.UTF8.GetBytes(tag_tree.bundle_scripts));
+                }
 
                 // Get pointer to HTML tree root element
                 var root  =  tag_tree.root;
@@ -133,10 +135,6 @@ namespace Templification {
                     var fwriter = new System.IO.StreamWriter(output_path);
                     fwriter.Write(output_html);
                     fwriter.Close();
-                    //or {
-                    //  Console.WriteLine("[DEBUG] "+ "Error writing file: " + output_path);
-                    //  return 1;
-                    //}
                 } //<═══ END SECTION;
                 if (cmd_line_options.debug_mode) {
                     Console.WriteLine(" [DEBUG] "+ "               <<< File Parsing Done\n");
@@ -160,7 +158,17 @@ namespace Templification {
             // ════════════════════════════════════════════════════════════════════
             // CLOSE OPEN FILES
 
+            // DELETE THE CSS FILE IF NOTHING WAS WRITEN
+            if (css_bundle_file.Length == 0 && File.Exists(cmd_line_options.out_css)) {
+                Console.WriteLine(" [INFO] Nothing written to CSS file, deleting.");
+                File.Delete(cmd_line_options.out_css);
+            }
             css_bundle_file.Close();
+            // DELETE THE JS FILE IF NOTHING WAS WRITEN
+            if (js_bundle_file.Length == 0 && File.Exists(cmd_line_options.out_js)) {
+                Console.WriteLine(" [INFO] Nothing written to JS file, deleting.");
+                File.Delete(cmd_line_options.out_js);
+            }
             js_bundle_file.Close();
 
             return file_count;

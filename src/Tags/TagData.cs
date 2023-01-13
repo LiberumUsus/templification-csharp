@@ -180,7 +180,7 @@ namespace Templification.Tags {
                 }
                 sbuilder.Append(this.name);
                 foreach (var KeyPair in this.attribs ) {
-                    var key = KeyPair.Key;
+                    var key    = KeyPair.Key;
                     var attrib = KeyPair.Value;
                     if (key.Length <= 0 || attrib.type == AttribType.command ) {
                         continue;

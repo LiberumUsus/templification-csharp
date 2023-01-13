@@ -134,12 +134,13 @@ namespace Templification.Tags {
 
 
         public TagTree process_commands(TagBranch usage) {
-            //(self TagTree)
             var new_tree     = this.clone();
             var delete_parts = new List<int>();
             var found_match  = false;
 
             var tbranch  =  new_tree.root;
+            // ITERATE OVER COMMANDS AND LOCATE NODES THAT WILL NOT BE INCLUDED
+            // IN FINAL SELECTION
             foreach (var command in tbranch.commands ) {
                 if (verify_command_value(command, usage) && !found_match ) {
                     found_match = true;
@@ -152,6 +153,7 @@ namespace Templification.Tags {
             }
 
             delete_parts.Reverse();
+            // DELETE NODES THAT ARE EXCLUDED BASED ON COMMANDS
             foreach (var index in delete_parts) {
                 if (index >= 0 && index < new_tree.root.children.Count) {
                     new_tree.root.children.RemoveAt(index);

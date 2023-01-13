@@ -289,7 +289,7 @@ namespace Templification {
             }
 
 
-            var base_dir       =  cmd.GetString("basedir") ; // or  "examples"
+            var base_dir       =  cmd.GetString("basedir");
             var in_path        =  get_cli_path(cmd, "input",     "src",        base_dir);
             var template_path  =  get_cli_path(cmd, "template",  "template",   base_dir);
             var style_dir      =  get_cli_path(cmd, "style-dir", "./src/",     base_dir,true);
@@ -298,23 +298,13 @@ namespace Templification {
             var out_css        =  get_cli_path(cmd, "out_css",   "bundle.css", out_path);
             var out_js         =  get_cli_path(cmd, "out_js",    "bundle.js",  out_path);
 
-            var ext  = cmd.GetString("extension") ; // or  "cshtml"
-
-
-            // HACK UPDATE JS OUT
-            if (out_css != "bundle.css" && out_js == base_dir + "/" + "bundle.js" ) {
-                var js_base  =  Utils.Utils.file_parent(out_css);
-                if (Utils.Utils.file_stem(js_base) == "css" ) {
-                    js_base = Utils.Utils.file_parent(js_base) + "/js";
-                }
-                out_js = js_base + "/bundle.js";
-            }
+            var ext  = cmd.GetString("extension");
 
 
             // Create new crawldata object for templification operations
             // #TODO: Need a better way to convert command line args into args
             //        variable for the rest of the code
-            var cmd_line_flags  = new  CmdLineOptions {
+            var cmd_line_flags = new  CmdLineOptions {
                 in_dir         = in_path,
                 template_dir   = template_path,
                 style_dir      = style_dir,
