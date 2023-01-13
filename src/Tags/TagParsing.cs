@@ -419,7 +419,6 @@ namespace Templification.Tags {
                             var startlen =  0;
                             var endlen   =  0;
                             var subtype  =  TagSubType.empty;
-                            var tagtype  =  TagType.empty;
 
                             var bound  =  watch.pop_match();
                             switch(watch.name) {
@@ -439,7 +438,6 @@ namespace Templification.Tags {
                                     startlen = match_lens.b;
                                     endlen   = match_lens.d;
                                     subtype  = TagSubType.comment;
-                                    tagtype  = TagType.text;
                                     break;
                                 }
                                 case "cshtml": {

@@ -10,7 +10,6 @@ namespace Templification.Tags {
 
         // CLONE A TAG NODE AND RETURN THE RESULT
         public TagBranch clone() {
-            //(TagBranch self)
             var cloned  = new TagBranch();
             cloned.copy(this);
             return cloned;
@@ -19,7 +18,6 @@ namespace Templification.Tags {
 
         // Copy one int nodeo another
         public void copy(TagBranch other) {
-            //(TagBranch self)
             this.iter_idx        = 0;
             this.tag             = other.tag.clone();
             this.parent          = other.parent;
@@ -52,7 +50,6 @@ namespace Templification.Tags {
         //   |_/_/ \_\___|   |_| |_|_\___|___| |___/ |_| |_|_\\___/ \___| |_| |___/
 
         public void process_attrib_commands() {
-            //(TagBranch self)
             if (this.tag.tag_type != TagType.root ) {
                 foreach (var KeyPair in this.tag.attribs ) {
                     var attr = KeyPair.Value;
@@ -84,20 +81,17 @@ namespace Templification.Tags {
 
 
         //pub void apply_ops(TagBranch func_listfn) {
-        //(TagBranch self)
         //    this.apply_ops(func_list)
         //}
 
 
 
         //pub void apply_ops_to_all(TagBranch func_listfn) {
-        //(TagBranch self)
         //    this.apply_ops_to_all(func_list)
         //}
 
 
         public void clear_vars(int depth) {
-            //(TagBranch self)
             var skip_tags  = new Dictionary<string,bool>  {
                 {"script"     ,true},
                 {"void"       ,true},
@@ -289,7 +283,6 @@ namespace Templification.Tags {
 
 
         public bool merge_with_template(TagBranch template_node, StyleSheet style_sheet) {
-            //(TagBranch self)
             // PREP CLASSES
             this.apply_local_style_tags(style_sheet);
             // MERGE ATTRIBS
@@ -307,7 +300,6 @@ namespace Templification.Tags {
 
 
         public int locate_default_attrib_merge_tag(int found_tags) {
-            //(TagBranch self)
             var local_count  =  found_tags;
 
             var i = 0;
@@ -340,7 +332,6 @@ namespace Templification.Tags {
         }
 
         void make_class_replacement(StyleSheet style_sheet) {
-            //(TagBranch self)
             if (!this.tag.attribs.ContainsKey("class")) return;
             var class_attrib = this.tag.attribs["class"];
             var top_classes  = class_attrib.value.Split(" ");
@@ -372,7 +363,6 @@ namespace Templification.Tags {
 
         // Add the matching class id to any element that has a local command in the style sheet
         void make_class_insert_by_tag(StyleSheet style_sheet) {
-            //(TagBranch self)
             var class_attrib = this.tag.attribs.ContainsKey("class") ? this.tag.attribs["class"] : new Attribs(); // Attribs  new or();
             var top_classes  =  class_attrib.value.Split(" ");
             if (style_sheet.has_class(this.tag.name) ) {
@@ -400,7 +390,6 @@ namespace Templification.Tags {
 
         // Merge attributes provided with the current nodes tag attributes
         public bool merge_attribs(Dictionary<string,Attribs> attribs , bool only_if_default) {
-            //(TagBranch self)
             var applied  =  false;
             var search_below  =  this.tag.tag_type == TagType.root || this.tag.tag_type == TagType.text || this.tag.no_merge_attribs;
 
@@ -432,7 +421,6 @@ namespace Templification.Tags {
 
 
         public List<TagBranch> exclude_children_by_id(Dictionary<int,string> ids ) {
-            //(TagBranch self)
             var filtered_list  = new List<TagBranch>();
             foreach (var child in this.children ) {
                 var cid  =  child.tag.get_id();
@@ -447,7 +435,6 @@ namespace Templification.Tags {
 
         // Print all of a tag node
         //pub void print_all() {
-        //(TagBranch self)
         //  switch(self) {
         //    TagBranch { this.print_all() }
         //    else { "" }
@@ -458,7 +445,6 @@ namespace Templification.Tags {
 
         // CLONE A TAG NODE AND RETURN THE RESULT AS A REF
         //public TagBranch clone_to_ref() {
-        //    //(TagBranch self)
         //    var cloned  = new  TagBranch{
         //        iter_idx    = this.iter_idx,
         //        tag         = this.tag.clone(),
@@ -480,7 +466,6 @@ namespace Templification.Tags {
         // INSERT INT CHILDRENO THE TAG NODE
         // NOTE* NEED TO UPDATE FUNCTION TO USE THE INDEX PARAMETER AT SOME POINT
         public int insert_at(List<TagBranch> childs, int index) {
-            //(TagBranch self)
             var new_index  =  index;
             // ERROR CHECKS
             if (childs.Count <= 0 ) {
@@ -501,7 +486,6 @@ namespace Templification.Tags {
         // INSERT INT CHILDRENO THE TAG NODE
         // INSERT THE CHILDREN BASED ON THEIR TAG NAME TO THE SLOT NAME THAT MATCHES
         public void insert_into_by_tag_name(List<TagBranch> childs, Dictionary<int,string> skip_list ) {
-            //(TagBranch self)
             // ERROR CHECKS
             if (childs.Count <= 0 ) {
                 return;
@@ -544,7 +528,6 @@ namespace Templification.Tags {
         // INSERT INT CHILDRENO THE TAG NODE
         // NOTE* NEED TO UPDATE FUNCTION TO USE THE INDEX PARAMETER AT SOME POINT
         public void insert_into(List<TagBranch> childs, string tag_name, Dictionary<string,Attribs> attribs , bool has_default, bool default_var_set) {
-            //(TagBranch self)
             // ERROR CHECKS
             if (childs.Count <= 0 ) {
                 return;
@@ -585,7 +568,6 @@ namespace Templification.Tags {
         // INSERT INT CHILDRENO THE TAG NODE
         // NOTE* NEED TO UPDATE FUNCTION TO USE THE INDEX PARAMETER AT SOME POINT
         public void insert_into_where(List<TagBranch> childs, string tag_name, Dictionary<string,Attribs> attribs ) {
-            //(TagBranch self)
             // ERROR CHECKS
             if (childs.Count <= 0 ) {
                 return;
@@ -671,7 +653,6 @@ namespace Templification.Tags {
 
 
         string previous_indent(int index) {
-            //(TagBranch self)
             var indent  =  "";
 
             if (this.children.Count > 0 && index > 0 && index - 1 <= this.children.Count ) {
@@ -687,7 +668,6 @@ namespace Templification.Tags {
 
 
         public Dictionary<string,bool> get_purge_slots() {
-            //(TagBranch self)
             var purge_slots  =  new Dictionary<string,bool>();
             foreach (var child in this.children ) {
                 if (child.tag.name == "slot" ) {
@@ -710,7 +690,6 @@ namespace Templification.Tags {
         // INSERT INT CHILDRENO THE TAG NODE
         // NOTE* NEED TO UPDATE FUNCTION TO USE THE INDEX PARAMETER AT SOME POINT
         public Dictionary<string,bool> remove_slots(bool keep_contents) {
-            //(TagBranch self)
             var index  =  0;
             var remove_list  =  new List<int>();
             var purge_slots  =  new Dictionary<string,bool>();
@@ -757,7 +736,6 @@ namespace Templification.Tags {
 
 
         public Dictionary<string,bool> locate_dep_slots() {
-            //(TagBranch self)
             var purge_slots  =  new Dictionary<string,bool>();
             for (var i = 0; i < this.children.Count; i++ ) {
                 var ctag  =  this.children[i].tag;
@@ -780,31 +758,38 @@ namespace Templification.Tags {
 
         // REMOVE SLOT DEPENDENCIES
         public void remove_slots_deps(Dictionary<string,bool> purge_slots ) {
-            //(TagBranch self)
-            var remove_list  =  new List<int>();
-            var depends_list =  new Dictionary<string,int>();
+            var remove_list  = new List<int>();
+            var depends_list = new Dictionary<string,int>();
+
+            // FIND ALL TAGS WITH A DEPENDS ATTRIBUTE
             for (var i = 0; i < this.children.Count; i++) {
-                var ctag  =  this.children[i].tag;
+                var ctag = this.children[i].tag;
                 if (ctag.attribs.ContainsKey("depends") && ctag.attribs["depends"].value.Length > 0 ) {
                     depends_list[ctag.attribs["depends"].value] = i;
                 }
             }
+
             // ADD CHILDREN THAT DEPEND ON SLOTS THAT REMAIN
-            foreach (var kp in depends_list ) {
-                var key = kp.Key;
-                var value = kp.Value;
-                if (purge_slots.ContainsKey(key) && purge_slots[key] ) {
-                    remove_list.Prepend(value);
+            foreach (var key in depends_list.Keys ) {
+                var child_index = depends_list[key];
+                if (purge_slots.ContainsKey(key) && purge_slots[key]) {
+                    remove_list.Add(child_index);
                 }
             }
+
+            // REVERSE THE LIST FOR REMOVAL SO INDEXES DON'T CHANGE
+            remove_list.Reverse();
+
+            // REMOVE ALL TAGS THAT DEPENDED ON A NON PROVIDED SLOT
             foreach (var i in remove_list ) {
-                var ctag  =  this.children[i].tag;
-                var dvalue  = ctag.attribs.ContainsKey("depends") ? ctag.attribs["depends"].value : "";
-                if (dvalue.Length > 0 && purge_slots.ContainsKey(dvalue) && purge_slots[dvalue] ) {
+                var ctag   = this.children[i].tag;
+                var dvalue = ctag.attribs.ContainsKey("depends") ? ctag.attribs["depends"].value : "";
+                if (dvalue.Length > 0 && purge_slots.ContainsKey(dvalue) && purge_slots[dvalue]) {
                     this.children.RemoveAt(i);
                 }
             }
 
+            // ITERATE DOWN THROUGH CHILDRENS CHILDREN
             foreach (var child in this.children ) {
                 child.remove_slots_deps(purge_slots);
             }
@@ -812,9 +797,9 @@ namespace Templification.Tags {
 
 
 
+
         // Add a child node from TagBranch a object
         //pub void add_child(TagBranch child, bool create_attrib) {
-        //(TagBranch self)
         //  switch(self) {
         //    TagBranch {
         //      dumb :=  new TagBranch();
@@ -831,7 +816,6 @@ namespace Templification.Tags {
 
         // Function to obtain the stylesheet for the node
         public StyleSheet parse_style_blocks(bool merge_up) {
-            //(TagBranch self)
             var id_assigned  =  false;
             var the_sheet  = new StyleSheet();
             if (this.style_sheet.id != -1 ) {
@@ -874,7 +858,6 @@ namespace Templification.Tags {
 
         // Get the inner content of the tag... might be buggy currently
         public string get_inner() {
-            //(TagBranch self)
             var text  =  "";
 
             if (this.tag.tag_type == TagType.start ) {
@@ -894,7 +877,6 @@ namespace Templification.Tags {
 
         // return bool a based on whether or not the node as a default variable in it
         public bool has_default() {
-            //(TagBranch self)
             var has_default  =  false;
 
             has_default = this.has_default_var;

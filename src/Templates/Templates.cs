@@ -47,7 +47,7 @@ namespace Templification.Templates {
             usage.clear_vars(1);
             usage.replace_vars(orig_branch);
             // LOCATE TAGS DEPENDING ON SLOT CONTENT
-            var purge_slots  =  usage.locate_dep_slots();
+            var purge_slots = usage.locate_dep_slots();
             // REMOVE EMPTY SLOTS
             usage.remove_slots(true);
             // REMOVE SLOT DEPENDENCIES WHERE NO SLOT PROVIDED
