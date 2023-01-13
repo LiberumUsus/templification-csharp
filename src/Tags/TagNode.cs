@@ -165,9 +165,10 @@ namespace Templification.Tags {
                 return;
             }
 
-
-            // REPLACE VARIABLES IN ATTRIBS
-            foreach (var name in self_tag.attribs.Keys) {
+            // REPLACE ATTRIBS
+            // USING KEY TO LIST TO SUPPORT REPLACMENTS I>E> NON ENUMERATION
+            var akeys = self_tag.attribs.Keys.ToList();
+            foreach (var name in akeys ) {
                 var attr = self_tag.attribs[name];
 
                 if (attr.type == AttribType.variable ) {
@@ -293,6 +294,15 @@ namespace Templification.Tags {
             this.apply_local_style_tags(style_sheet);
             // MERGE ATTRIBS
             return this.merge_attribs(template_node.tag.attribs, false);
+        }
+
+
+        // APPLY ANY INTERNAL ATTRIB COMMANDS
+        public void apply_internal_attrib_commands(bool isFinalCall = false) {
+            if (isFinalCall) {
+            } else {
+                // TBD
+            }
         }
 
 

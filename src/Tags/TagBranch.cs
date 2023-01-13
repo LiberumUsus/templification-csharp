@@ -35,6 +35,14 @@ namespace Templification.Tags {
         public List<TagBranch>                    children    = new List<TagBranch>();
 
 
+        public TagBranch() {}
+
+        public TagBranch(string tagName, TagBranch parentNode) {
+            tag         = new TagData(tagName, TagType.start, TagSubType.empty);
+            closing_tag = new TagData(tagName, TagType.end, TagSubType.empty);
+            parent      = parentNode;
+        }
+
         // Print the outer section of the branch
         public void print_outer() {
             //(TagBranch self)

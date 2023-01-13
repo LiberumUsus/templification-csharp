@@ -21,7 +21,15 @@ namespace Templification.Tags {
         public Dictionary<string,Attribs> attribs          = new Dictionary<string,Attribs>();
         public Dictionary<string,Attribs> internal_attribs = new Dictionary<string,Attribs>();
 
+        public TagData() {
 
+        }
+        public TagData(string tagName, TagType ttype, TagSubType subType, string tstrData = "") {
+            name     = tagName;
+            tag_type = ttype;
+            sub_type = subType;
+            tstr     = tstrData;
+        }
 
         public bool is_set() {
             return this.name.Length > 0 && this.tag_type != TagType.empty;
