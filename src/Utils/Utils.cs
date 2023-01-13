@@ -108,7 +108,7 @@ namespace Templification.Utils {
         public static string file_stem(string str) {
             var dot_index =  -1;
             var basename  =  Path.GetFileName(str);
-            dot_index = basename.LastIndexOf(".") ; // or  basename.len
+            dot_index = basename.LastIndexOf(".");
             return basename.Substring(0, dot_index);
         }
 
@@ -118,7 +118,7 @@ namespace Templification.Utils {
         public static string file_parent(string str) {
             var fname  =  Path.GetFileName(str);
             if (fname.Length > 0 ) {
-                return new DirectoryInfo(str).Name;
+                return new DirectoryInfo(str).Parent.ToString();
             } else {
                 return str;
             }
