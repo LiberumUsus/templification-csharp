@@ -57,7 +57,7 @@ namespace Templification {
 
                 // Current file
                 if (cmd_line_options.debug_mode) {
-                    Console.WriteLine("[DEBUG] "+ "READING FILE: " + source_file.path);
+                    Console.WriteLine(" [DEBUG] "+ "READING FILE: " + source_file.path);
                 }
 
                 // ════════════════════════════════════════════════════════════════════

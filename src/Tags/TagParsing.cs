@@ -17,7 +17,7 @@ namespace Templification.Tags {
             var findex       =  0;
             var tag_groups   =  new List<TagGroup>();
             var pat_tag_any  =  "(\\s*<.*?>)";
-            var any_ex  = new Regex(pat_tag_any, RegexOptions.Singleline); // or  panic(err)
+            var any_ex  = new Regex(pat_tag_any, RegexOptions.Singleline);
 
             var special_groups = collect_preprocess_blocks(source, options);
             var sub_source = "";
@@ -81,7 +81,7 @@ namespace Templification.Tags {
             };
 
             var was_matched  = false;
-            if (group.sub_type != TagSubType.cshtml) {
+            if (group.sub_type != TagSubType.cshtml && group.sub_type != TagSubType.comment) {
                 if (!was_matched) was_matched = attempt_match(TagType.start,  script_start_ex, sub_source, tag);
                 if (!was_matched) was_matched = attempt_match(TagType.end,    script_end_ex,   sub_source, tag);
                 if (!was_matched) was_matched = attempt_match(TagType.single, single_ex,       sub_source, tag);
@@ -113,6 +113,7 @@ namespace Templification.Tags {
                         process_razor_cmd(sub_source, tag);
                     }
                     tag.tag_type = TagType.text;
+                    tag.sub_type = group.sub_type;
                     var index  = sub_source.IndexOf("\n");
                     if  (index > 0) {
                         tag.new_line = "\n";
@@ -220,11 +221,12 @@ namespace Templification.Tags {
                 if (item.Trim().Length <= 0 ) {
                     continue;
                 }
-                var value      =  "";
-                var options    =  "";
-                var attr_type  =  AttribType.standard;
-                var parts  =  item.SplitNth("=", 1);
-                var key  =  parts[0].ToLower().Trim();
+                var value     =  "";
+                var options   =  "";
+                var attr_type =  AttribType.standard;
+                var parts     =  item.SplitNth("=", 1);
+                var key       =  parts[0].ToLower().Trim();
+
                 value = (parts.Length > 1) ? parts[1] : "";
                 if (value.Length <= 0 ) {
                     value = key;
@@ -299,7 +301,7 @@ namespace Templification.Tags {
                                 current_node.tag.merge_bounds(tag);
 
                                 // STORE TEXT EXACTLY IF IT IS A SCRIPT TAG
-                                if (current_node.tag.sub_type == TagSubType.script ) {
+                                if (current_node.tag.sub_type == TagSubType.script || current_node.tag.sub_type == TagSubType.comment) {
                                     current_node.tag.tstr = source[current_node.tag.outer.start..current_node.tag.outer.end];
                                 } else if (current_node.tag.sub_type == TagSubType.void_exact ) {
                                     var vstart  =  current_node.tag.outer.start + 12;
@@ -378,6 +380,11 @@ namespace Templification.Tags {
             vwatcher.offsets(1, 0);
             vwatcher.reporting = false;
 
+            var comwatcher  = new Watcher();
+            comwatcher.init("comments", "<!-- --> \\");
+            comwatcher.useouter(true);
+            comwatcher.offsets(0, 0);
+
             var cswatcher  = new Watcher();
             cswatcher.init("cshtml", cs_start + " " + cs_end + " \\");
             cswatcher.useouter(true);
@@ -385,7 +392,7 @@ namespace Templification.Tags {
             cswatcher.reporting   = true;
             cswatcher.active      = options.preprocess_razor;
 
-            var watchers = new Watcher[]{swatcher, vwatcher, cswatcher};
+            var watchers = new Watcher[]{swatcher, vwatcher, cswatcher, comwatcher};
             var i = 0;
             foreach (var chr in source ) {
                 foreach (var watch in watchers ) {
@@ -397,12 +404,17 @@ namespace Templification.Tags {
                         continue;
                     }
 
+                    if (watch.name == "void" && comwatcher.is_searching() ) {
+                        continue;
+                    }
+
                     if (mpoint.b >= 0 ) {
                         // SECOND POINT OBTAINED
                         if (mpoint.d > 0 ) {
                             var startlen =  0;
                             var endlen   =  0;
                             var subtype  =  TagSubType.empty;
+                            var tagtype  =  TagType.empty;
 
                             var bound  =  watch.pop_match();
                             switch(watch.name) {
@@ -416,6 +428,13 @@ namespace Templification.Tags {
                                     startlen = match_lens.b;
                                     endlen   = match_lens.d;
                                     subtype  = TagSubType.void_exact;
+                                    break;
+                                }
+                                case "comments": {
+                                    startlen = match_lens.b;
+                                    endlen   = match_lens.d;
+                                    subtype  = TagSubType.comment;
+                                    tagtype  = TagType.text;
                                     break;
                                 }
                                 case "cshtml": {
@@ -439,22 +458,39 @@ namespace Templification.Tags {
                                         start = mpoint.b + 1,
                                         end = mpoint.d,
                                         sub_type = subtype,
+                                        type = TagType.start,
                                     });
                                 out_tags.Add(new TagGroup{
                                         start = mpoint.d,
                                         end = mpoint.d,
                                         sub_type = subtype,
+                                        type = TagType.end,
+                                    });
+                            } else if (watch.name == "comments" ) {
+                                out_tags.Add(new TagGroup{
+                                        start = mpoint.b + 1,
+                                        end = mpoint.d,
+                                        sub_type = subtype,
+                                        type = TagType.text,
+                                    });
+                                out_tags.Add(new TagGroup{
+                                        start = mpoint.d,
+                                        end = mpoint.d,
+                                        sub_type = subtype,
+                                        type = TagType.text,
                                     });
                             } else {
                                 out_tags.Add(new TagGroup{
                                         start = mpoint.b,
                                         end = mpoint.b + startlen + 1,
                                         sub_type = subtype,
+                                        type = TagType.start,
                                     });
                                 out_tags.Add(new TagGroup{
                                         start = mpoint.d - endlen,
                                         end = mpoint.d,
                                         sub_type = subtype,
+                                        type = TagType.end,
                                     });
                             }
                         }

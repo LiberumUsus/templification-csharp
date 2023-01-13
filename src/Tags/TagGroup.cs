@@ -17,6 +17,7 @@ namespace Templification.Tags {
         script,
         void_exact,
         cshtml,
+        comment,
         empty,
     }
 

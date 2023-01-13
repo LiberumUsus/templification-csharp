@@ -24,12 +24,10 @@ namespace Templification.Tags {
 
 
         public bool is_set() {
-            //(TagData self)
             return this.name.Length > 0 && this.tag_type != TagType.empty;
         }
 
         public string str() {
-            //(TagData self)
             var sbuild  =  new StringBuilder(50);
 
             sbuild.Append(this.name + "\n");
@@ -43,7 +41,6 @@ namespace Templification.Tags {
 
         // Clone TagData a and return the tag
         public TagData clone() {
-            //(TagData self)
             var new_source  =  "";
             if (!string.IsNullOrEmpty(this.source)) {
                 new_source = this.source;
@@ -75,7 +72,6 @@ namespace Templification.Tags {
 
         // Merge attributes int providedo existing
         public void merge_attribs(Dictionary<string,Attribs> attribs , bool only_important) {
-            //(TagData self)
             var mergeable  = new Dictionary<string, bool> {
                 {"class", true},
                 {"style", true}
@@ -111,7 +107,6 @@ namespace Templification.Tags {
 
         // Merge bounds from other tag
         public void merge_bounds(TagData otag) {
-            //(TagData self)
             var new_outer  = new Re_group {
                 start = this.outer.start,
                 end = otag.outer.end,
@@ -121,20 +116,17 @@ namespace Templification.Tags {
 
         // TagData Get unique id
         public int get_id() {
-            //(TagData self)
             return this.id;
         }
 
         // TagData Set unique id
         public void generate_id() {
             var rand = new Random();
-            //(TagData self)
             this.id = rand.Next();
         }
 
         // Print TagData a object
         public void print_all() {
-            //(TagData self)
             switch(this.tag_type) {
                 case TagType.text: {
                     Console.WriteLine(this.tstr);
@@ -154,7 +146,6 @@ namespace Templification.Tags {
 
         // return string a rep of the object
         public string to_string(int indent) {
-            //(TagData self)
             var out_string  =  "";
             var padding  =  new String(' ', indent);
 
@@ -162,15 +153,20 @@ namespace Templification.Tags {
                 if (this.tstr.Trim().Length > 0 ) {
                     switch(this.sub_type) {
                         case TagSubType.script: {
+                            out_string = "\n" + padding + this.tstr;
+                            break;
+                        }
+                        case TagSubType.comment: {
                             out_string = "\n" + padding;
+                            out_string += this.tstr.Trim();
                             break;
                         }
                         default: {
+                            out_string = this.tstr;
                             break;
                         }
                     }
 
-                    out_string += this.tstr;
                 }
             } else if (this.tag_type != TagType.empty && this.sub_type != TagSubType.void_exact ) {
                 var sbuilder  =  new StringBuilder(50);
@@ -208,7 +204,6 @@ namespace Templification.Tags {
 
         // string Write info to data file
         public TextData get_text_data() {
-            //(TagData self)
             var tdat  = new TextData();
             if (this.tag_type == TagType.text ) {
                 if (this.tstr.Trim().Length > 0 ) {
@@ -220,7 +215,6 @@ namespace Templification.Tags {
 
         // Print outer bounds from source TagData for
         public void print_outer() {
-            //(TagData self)
             if (!string.IsNullOrEmpty(this.source)) {
                 var sref  =  this.source;
                 Console.WriteLine(sref[this.outer.start..this.outer.end]);
@@ -229,7 +223,6 @@ namespace Templification.Tags {
 
         // Initialize function TagData for
         public void init(string name, string source, Re_group bounded) {
-            //(TagData self)
             this.name = name;
             this.source = source;
             this.outer = bounded;
