@@ -99,10 +99,10 @@ namespace Templification.Tags {
         public void clear_vars(int depth) {
             //(TagBranch self)
             var skip_tags  = new Dictionary<string,bool>  {
-                {"script", true},
-                {"void", true},
-                {"void_exact", true},
-                {"style", true}
+                {"script"     ,true},
+                {"void"       ,true},
+                {"void_exact" ,true},
+                {"style"      ,true}
             };
 
             if (skip_tags.ContainsKey(this.tag.name.ToLower()) ) {
@@ -230,7 +230,7 @@ namespace Templification.Tags {
             // AFTER DEFAULTS REPLACED WE CAN RUN THIS
             // TODO: THIS WHOLE SECTION BELOW NEEDS TO GO SOMEWHERE ELSE AND CLEAN UP THIS WHOLE FUNTION :C
             if (self_tag.tstr.Contains("{")) {
-                var varex  = new Regex("{[$]?[a-zA-Z:|]+}") ; // or   new regex.RE();
+                var varex  = new Regex("{[$]?[a-zA-Z:|]+}");
                 var var_matches  =  Utils.Utils.make_location_groups(varex.Matches(self_tag.tstr).ToList(), 0);
                 foreach (var vmatch in var_matches ) {
                     var vmatch_str = self_tag.tstr[vmatch.start..vmatch.end];

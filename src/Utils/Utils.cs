@@ -321,7 +321,7 @@ namespace Templification.Utils {
                 } else {
                     new_value = source;
                 }
-                b = group.end + 1;
+                b = group.end;
             }
             if (group_matches.Count > 0 && b < source.Length ) {
                 new_value += source[b..];
