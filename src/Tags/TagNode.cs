@@ -120,6 +120,10 @@ namespace Templification.Tags {
                     } else if (attr.value.Contains("{") && depth < 0) {
                         if (!attr.value.ToLower().Contains("@html") ) {
                             var new_value  = Utils.Utils.clear_between(attr.value, "{", "}");
+                            // CLEAN UP TRAILING OR CONDITIONS... SUPER HACKY.. PROBABLY NEED TO REWRITE
+                            // AAAALL OF THE VAR/CLASS REPLACMENT FUNCTIONS :(
+                            if (new_value.Contains("| ")) new_value = new_value.Replace("| ", " ");
+                            if (new_value.EndsWith("|")) new_value = new_value.Substring(0,new_value.Length-1);
                             this.tag.attribs[name] = new Attribs {
                                 value = new_value,
                                 type = AttribType.standard,
@@ -143,74 +147,83 @@ namespace Templification.Tags {
         }
 
 
-
+        // Replace variables in node with values from orig_node
+        // Commonly called after a node has been templatized (templates filled in)
         public void replace_vars(TagBranch orig_node) {
-            //(TagBranch self)
             var skip_tags  = new Dictionary<string,bool> {
                 {"script", true},
                 {"void", true},
                 {"void_exact", true}
             };
 
-            var orig_attribs = orig_node.tag.attribs.clone();
-            var self_tag  =  this.tag;
+            var var_regex        = new Regex("((?<prevar>[^ ]+)[|])?[{](?<vars>[^ ]+)[}]");
+            var orig_attribs     = orig_node.tag.attribs.clone();
+            var orig_var_attribs = orig_node.tag.get_attribs_bytype(AttribType.variable);
+            var self_tag         =  this.tag;
             if (skip_tags.ContainsKey(self_tag.name.ToLower().Trim()) ) {
+                // This tag (html elem) is in the skip list, so skip it
                 return;
             }
-            // REPLACE ATTRIBS
-            var akeys = self_tag.attribs.Keys.ToList();
-            foreach (var name in akeys ) {
+
+
+            // REPLACE VARIABLES IN ATTRIBS
+            foreach (var name in self_tag.attribs.Keys) {
                 var attr = self_tag.attribs[name];
+
                 if (attr.type == AttribType.variable ) {
                     if (orig_attribs.ContainsKey(name) ) {
                         self_tag.attribs.Remove(name);
                         self_tag.attribs[orig_attribs[name].value] = orig_attribs[name];
                         self_tag.attribs[orig_attribs[name].value].value = self_tag.attribs[orig_attribs[name].value].value.Trim();
                     }
-                } else {
-                    foreach (var AttName in orig_attribs ) {
-                        var sattr = AttName.Value;
-                        var sname = AttName.Key;
-                        if (sattr.type == AttribType.variable ) {
-                            // Split up "or" options
-                            if (attr.value.Contains("|") ) {
-                                var or_ops  =  attr.value.Split("|");
-                                foreach (var op in or_ops ) {
-                                    if (op.Contains(sname) && !string.IsNullOrEmpty(sname)) {
-                                        attr.value = op.Replace(sname, sattr.value).Trim();
-                                        break;
-                                    }
+                } else if (orig_var_attribs.Keys.Count > 0) {
+                    string new_attrib_value = attr.value;
+                    // DOES ATTRIBUTE CONTAIN A VARIABLE
+                    if (attr.value.Contains("{")) {
+                        // Replace special variable {default} with original node first node text, if it is text
+                        var matches = var_regex.Matches(new_attrib_value);
+                        foreach (var match in matches.ToList()) {
+                            var prevars      = match.Groups["prevar"].Value;
+                            var matched_vars = match.Groups["vars"].Value;
+                            var varParts = matched_vars.Split('|');
+                            var notReplaced = true;
+                            foreach(var vp in varParts) {
+                                var varKey = "{"+vp.ToLower()+"}";
+
+                                if (orig_var_attribs.ContainsKey(varKey)) {
+                                    var source_attrib = orig_var_attribs["{"+vp.ToLower()+"}"];
+                                    new_attrib_value = new_attrib_value.Replace(match.Value, source_attrib.value);
+                                    notReplaced = false;
+                                    break; // GET FIRST FOUND
                                 }
-                            } else if (attr.value.Contains(sname) && !string.IsNullOrEmpty(sname) ) {
-                                attr.value = attr.value.Replace(sname, sattr.value).Trim();
                             }
-                            // AFTER VARIABLE REPLACEMENT REMOVE IF EMPTY AND VALUE WAS EMPTY
-                            // TODO: This is NOT pretty... fix me. Need attrib variable indicating
-                            // that no value was set with the key instead of this.
-                            if (attr.value == sname && sattr.value == sname ) {
-                                self_tag.attribs.Remove(name);
+                            if (prevars.Length > 0 && notReplaced) {
+                                new_attrib_value = new_attrib_value.Replace(match.Value, prevars);
                             }
                         }
                     }
-                    if (attr.value.StartsWith("{") && attr.value.Contains("default")) {
-                        if (orig_node.children.Count > 0 && orig_node.children[0].tag.tag_type == TagType.text ) {
-                            attr.value = orig_node.children[0].tag.tstr.Trim();
-                        }
+                    // REPLACE VALUE WITH CHANGES
+                    attr.value = new_attrib_value;
+                }
+                if (Regex.Match(attr.value, @"[{]\s*default\s*[}]").Success) {
+                    if (orig_node.children.Count > 0 && orig_node.children[0].tag.tag_type == TagType.text ) {
+                        attr.value = orig_node.children[0].tag.tstr.Trim();
                     }
                 }
+
             }
 
             // REPLACE TEXT
-            foreach (var KeyPair in orig_attribs) {
-                var attr = KeyPair.Value;
-                var name = KeyPair.Key;
+            foreach (var key in orig_attribs.Keys) {
+                var attr = orig_attribs[key];
                 if (attr.type == AttribType.variable ) {
                     if (!attr.value.ToLower().Contains("@html") ) {
-                        self_tag.tstr = self_tag.tstr.Replace(name, attr.value);
+                        self_tag.tstr = self_tag.tstr.Replace(key, attr.value);
                     }
                 }
             }
 
+            // REPLACE {default} variable when it is in the text of a node not the attributes
             if (self_tag.tstr.Contains("{default}")) {
                 if (orig_node.children.Count > 0 && orig_node.children[0].tag.tag_type == TagType.text ) {
                     self_tag.tstr = self_tag.tstr.Replace("{default}", orig_node.children[0].tag.tstr.Trim());
@@ -218,14 +231,16 @@ namespace Templification.Tags {
             }
 
             replace_tag_str_vars(this, self_tag, orig_attribs);
-            // REPLACE CHILDREN
+            // REPLACE CHILDRENS VARIABLES, ALLOWS REPLACEMENT INTO CHILD NODES FROM TEMPLATE
             foreach (var child in this.children ) {
                 child.replace_vars(orig_node);
             }
-        }
+
+        } // END REPLACE_VARS FUNCTION
 
 
 
+        // Process Tag text for variables
         void replace_tag_str_vars(TagBranch self, TagData self_tag, Dictionary<string,Attribs> orig_attribs  ) {
             // AFTER DEFAULTS REPLACED WE CAN RUN THIS
             // TODO: THIS WHOLE SECTION BELOW NEEDS TO GO SOMEWHERE ELSE AND CLEAN UP THIS WHOLE FUNTION :C
@@ -307,7 +322,6 @@ namespace Templification.Tags {
 
 
         public void apply_local_style_tags(StyleSheet style_sheet) {
-            //(TagBranch self)
             this.make_class_replacement(style_sheet);
             this.make_class_insert_by_tag(style_sheet);
             foreach (var child in this.children ) {
@@ -323,11 +337,17 @@ namespace Templification.Tags {
 
             var index  = 0;
             foreach (var tclass in top_classes ) {
-                if (style_sheet.has_class(tclass) ) {
-                    var cclass  =  style_sheet.get_class(tclass, false);
-                    var cid = (!cclass.global && tclass != "active" ) ?  "-ss" + cclass.id.ToString()  :  "" ;
-                    top_classes[index] = tclass + cid;
+                // RETAIN OR OPERATORS IN CLASSES UNTIL VARIABLE REPLACEMENT
+                var ptclasses = tclass.Split('|');
+                for (int i = 0; i < ptclasses.Length; i++) {
+                    var ptclass = ptclasses[i];
+                    if (style_sheet.has_class(ptclass) ) {
+                        var cclass  =  style_sheet.get_class(ptclass, false);
+                        var cid = (!cclass.global && ptclass != "active" ) ?  "-ss" + cclass.id.ToString()  :  "" ;
+                        ptclasses[i] = ptclass + cid;
+                    }
                 }
+                top_classes[index] = string.Join('|', ptclasses).Trim();
                 index++;
             }
 

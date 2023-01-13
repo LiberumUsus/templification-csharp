@@ -70,6 +70,18 @@ namespace Templification.Tags {
             return new_tag;
         }
 
+
+
+        public Dictionary<string, Attribs> get_attribs_bytype(AttribType type) {
+            var newMap = new Dictionary<string, Attribs>();
+            foreach(var keyPair in attribs) {
+                if (keyPair.Value.type == type) {
+                    newMap[keyPair.Key] = keyPair.Value;
+                }
+            }
+            return newMap;
+        }
+
         // Merge attributes int providedo existing
         public void merge_attribs(Dictionary<string,Attribs> attribs , bool only_important) {
             var mergeable  = new Dictionary<string, bool> {

@@ -207,10 +207,15 @@ namespace Templification.Tags {
                 return mapping;
             }
 
-            var attrib_rgstr  = "([^\"= ]+)[=][{\"'][^\"]*['\"}]";
-            var reggy = new Regex(attrib_rgstr) ; // or   new regex.RE();
-            var int_locations = reggy.Matches(attribs);
-            var matches  =  Utils.Utils.match_strings_from_location_ints(int_locations.ToList(), attribs, true);
+            var reggy  = new Regex("([^\"'= ]+)[=][{\"][^\"]*[\"}]");
+            var reggy2 = new Regex("([^\"'= ]+)[=][{'][^']*['}]");
+            var int_locations  = reggy.Matches(attribs);
+            var int_locations2 = reggy2.Matches(attribs);
+            var matches  = Utils.Utils.match_strings_from_location_ints(int_locations.ToList(), attribs, true);
+            // Last param = false because we already gathered nonconforming entries in previous call
+            var matches2 = Utils.Utils.match_strings_from_location_ints(int_locations2.ToList(), attribs, false);
+
+            matches.AddRange(matches2);
 
             if (matches.Count <= 0 ) {
                 var empty_rex  = new Regex("\\s+") ; // or   new regex.RE();

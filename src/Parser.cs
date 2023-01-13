@@ -192,7 +192,7 @@ namespace Templification {
                         // ------------------------------------ END MERGE/USE OF TEMPLATE
                     } else {
                         // REPLACE LOCAL VARS AS NEEDED
-                        tbranch.replace_vars(new TagBranch{});
+                        tbranch.replace_vars(new TagBranch());
                     }
                 }
             }
