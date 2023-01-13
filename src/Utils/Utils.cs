@@ -98,7 +98,7 @@ namespace Templification.Utils {
                 }
 
             }
-            opened_file = File.Open(path_to_file, FileMode.OpenOrCreate);
+            opened_file = File.Open(path_to_file, FileMode.Create);
             return 0;
         }
 

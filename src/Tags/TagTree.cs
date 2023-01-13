@@ -1,3 +1,5 @@
+using System.Text;
+
 using Templification.Utils;
 using Templification.Styles;
 
@@ -6,7 +8,7 @@ namespace Templification.Tags {
     // Tree Structure for operating on TagBranch a root node
     public class TagTree {
 
-        public string bundle_scripts = "";
+        public Dictionary<string, StringBuilder> bundled_scripts = new Dictionary<string, StringBuilder>();
 
         public TagBranch                          root       = new TagBranch();
         public StyleSheet                         styles     = new StyleSheet();
@@ -47,8 +49,7 @@ namespace Templification.Tags {
 
 
         public void collect_scripts() {
-            //(self TagTree)
-            this.bundle_scripts = this.root.collect_scripts();
+            this.root.collect_scripts(this.bundled_scripts);
         }
 
 

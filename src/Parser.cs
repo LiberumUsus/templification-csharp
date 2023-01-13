@@ -19,6 +19,7 @@ namespace Templification {
             var master_classes = new Dictionary<string,bool>();
             var master_sheet   = new StyleSheet();
             var master_text    = new List<TextData>();
+            var js_parent_path = "";
 
             FileStream? css_bundle_file;
             FileStream? js_bundle_file;
@@ -38,6 +39,8 @@ namespace Templification {
 
             // Double check and make sure filestreams are not null
             if (css_bundle_file == null || js_bundle_file == null) return 0;
+
+            js_parent_path = Utils.Utils.file_parent(cmd_line_options.out_js);
 
             // Default return value
             var file_count = (uint)crawl_files.input_files.Count;
@@ -103,12 +106,20 @@ namespace Templification {
                 // WRITING OUTPUT HTML
 
                 // Write collected javascript to bundle file
-                if (tag_tree.bundle_scripts.Trim().Length > 0) {
-                    js_bundle_file.Write(Encoding.UTF8.GetBytes(tag_tree.bundle_scripts));
+                if (tag_tree.bundled_scripts.ContainsKey("_bundle_") && tag_tree.bundled_scripts["_bundle_"].Length > 0) {
+                    js_bundle_file.Write(Encoding.UTF8.GetBytes(tag_tree.bundled_scripts["_bundle_"].ToString()));
+                }
+                // WRITE JAVASCRIPT TO OTHER TARGETS. TODO: THIS IS PROBABLY CRAZY INEFFICIENT, NEEDS UPDATING
+                foreach(var key in tag_tree.bundled_scripts.Keys) {
+                    if (key != "_bundle_") {
+                        using (var destination = File.AppendText(js_parent_path + "/" + key + ".js")) {
+                            destination.WriteLine(tag_tree.bundled_scripts[key].ToString());
+                        }
+                    }
                 }
 
                 // Get pointer to HTML tree root element
-                var root  =  tag_tree.root;
+                var root = tag_tree.root;
 
                 // Get output path for output file
                 var ifile_path  =  trim_path_prefix_add_ext(source_file.get_path(), cmd_line_options.in_dir, cmd_line_options.out_ext);

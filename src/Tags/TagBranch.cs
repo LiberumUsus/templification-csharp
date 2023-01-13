@@ -24,7 +24,6 @@ namespace Templification.Tags {
         public int    iter_idx;
         public int    indent;
         public bool   has_default_var;
-        public string bundle_scripts = "";
 
         public TagData                            tag         = new TagData();
         public TagData                            closing_tag = new TagData();
@@ -88,8 +87,10 @@ namespace Templification.Tags {
             }
         }
 
+
+
+        // COLLECT CLASSES FROM TAGS, THIS IS DIFFERENT THAN STYLE BLOCK COLLECTION
         public void collect_classes(Dictionary<string,bool> list ) {
-            //(TagBranch self)
             if (this.tag.attribs.ContainsKey("class")) {
                 var class_array  =  this.tag.attribs["class"].value.Split(" ");
                 foreach (var item in class_array ) {
@@ -104,20 +105,30 @@ namespace Templification.Tags {
         }
 
 
-        public string collect_scripts() {
-            //(TagBranch self)
-            var sbuild  =  new StringBuilder(100);
+
+        // COLLECT SCRIPT BLOCK SCRIPTS
+        public void collect_scripts(Dictionary<string, StringBuilder> collected) {
+            var location = "_bundle_";
 
             if (this.tag.sub_type == TagSubType.script && this.tag.attribs.ContainsKey("target") && this.tag.attribs["target"].value == "bundle" ) {
-                var part  =  this.tag.tstr.AllAfter(">");
-                var end_tag_index  = part.LastIndexOf("<") ; // or  this.tag.tstr.Length
+                if (this.tag.attribs.ContainsKey("location")) {
+                    var checkValue = this.tag.attribs["location"].value;
+                    if (Regex.Match(checkValue, @"[a-zA-Z0-9]+").Success) {
+                        location = checkValue;
+                    }
+                }
+                var part           = this.tag.tstr.AllAfter(">");
+                var end_tag_index  = part.LastIndexOf("<");
                 part = part[..end_tag_index];
-                sbuild.Append(part);
+                // ENSURE LOCATION EXISTS
+                if (!collected.ContainsKey(location)) {
+                    collected.Add(location, new StringBuilder(100));
+                }
+                collected[location].Append(part);
             }
             foreach (var child in this.children ) {
-                sbuild.Append(child.collect_scripts());
+                child.collect_scripts(collected);
             }
-            return sbuild.ToString();
         }
 
         // Create string a of the object

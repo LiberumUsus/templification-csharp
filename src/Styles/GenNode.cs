@@ -101,7 +101,7 @@ namespace Templification.Styles {
                     return srules;
                 } else if (snode != null) {
                     // TRY REGEX MATCHING
-                    var trex    = new Regex(snode.value[0]) ; // or   new regex.RE();
+                    var trex    = new Regex(snode.value[0]);
                     var matches = trex.Match(current.Trim());
                     if (matches.Success) {
                         var vdirs =  new List<string>();
@@ -111,6 +111,7 @@ namespace Templification.Styles {
                                 foreach (var subs in gen_list.locations[cdir.ToString()].Split("|") ) {
                                     vdirs.Add(subs);
                                 }
+
                             } else {
                                 vdirs.Add(gen_list.locations[cdir.ToString()]);
                             }
@@ -151,6 +152,7 @@ namespace Templification.Styles {
                             }
                             vunit = "";
                         }
+
 
                         if (vvalue.Length > 0 ) {
                             var trules  =  new List<Rule>();
