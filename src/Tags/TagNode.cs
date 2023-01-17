@@ -6,6 +6,28 @@ using Templification.Utils;
 
 namespace Templification.Tags {
 
+    // Tags type enum, for <start> </end> and <single/> style tags
+    public enum TagType {
+        start,
+        end,
+        single,
+        root,
+        text,
+        empty,
+    }
+
+    public enum TagSubType {
+        command,
+        variable,
+        style,
+        script,
+        void_exact,
+        cshtml,
+        comment,
+        empty,
+    }
+
+
     public partial class TagBranch {
 
         // CLONE A TAG NODE AND RETURN THE RESULT
@@ -80,17 +102,6 @@ namespace Templification.Tags {
 
 
 
-        //pub void apply_ops(TagBranch func_listfn) {
-        //    this.apply_ops(func_list)
-        //}
-
-
-
-        //pub void apply_ops_to_all(TagBranch func_listfn) {
-        //    this.apply_ops_to_all(func_list)
-        //}
-
-
         public void clear_vars(int depth) {
             var skip_tags  = new Dictionary<string,bool>  {
                 {"script"     ,true},
@@ -139,6 +150,7 @@ namespace Templification.Tags {
                 }
             }
         }
+
 
 
         // Replace variables in node with values from orig_node
@@ -299,6 +311,7 @@ namespace Templification.Tags {
         }
 
 
+
         public int locate_default_attrib_merge_tag(int found_tags) {
             var local_count  =  found_tags;
 
@@ -323,6 +336,7 @@ namespace Templification.Tags {
         }
 
 
+
         public void apply_local_style_tags(StyleSheet style_sheet) {
             this.make_class_replacement(style_sheet);
             this.make_class_insert_by_tag(style_sheet);
@@ -330,6 +344,8 @@ namespace Templification.Tags {
                 child.apply_local_style_tags(style_sheet);
             }
         }
+
+
 
         void make_class_replacement(StyleSheet style_sheet) {
             if (!this.tag.attribs.ContainsKey("class")) return;
@@ -360,6 +376,8 @@ namespace Templification.Tags {
                 this.tag.attribs["class"].value = updated_classes;
             }
         }
+
+
 
         // Add the matching class id to any element that has a local command in the style sheet
         void make_class_insert_by_tag(StyleSheet style_sheet) {
@@ -430,36 +448,6 @@ namespace Templification.Tags {
             }
             return filtered_list;
         }
-
-
-
-        // Print all of a tag node
-        //pub void print_all() {
-        //  switch(self) {
-        //    TagBranch { this.print_all() }
-        //    else { "" }
-        //  }
-        //}
-
-
-
-        // CLONE A TAG NODE AND RETURN THE RESULT AS A REF
-        //public TagBranch clone_to_ref() {
-        //    var cloned  = new  TagBranch{
-        //        iter_idx    = this.iter_idx,
-        //        tag         = this.tag.clone(),
-        //        slot_map    = new Dictionary<string,List<TagBranch>>(this.slot_map),
-        //        indent      = this.indent,
-        //        closing_tag = this.closing_tag.clone(),
-        //        commands    = new List<BranchCommand>(this.commands),
-        //        parent      = this.parent,
-        //    };
-        //    // ADDING CHILDREN CREATE SLOT MAPS
-        //    foreach (var child in this.children ) {
-        //        cloned.add_child(child.clone(), false);
-        //    }
-        //    return cloned;
-        //}
 
 
 
@@ -794,23 +782,6 @@ namespace Templification.Tags {
                 child.remove_slots_deps(purge_slots);
             }
         }
-
-
-
-
-        // Add a child node from TagBranch a object
-        //pub void add_child(TagBranch child, bool create_attrib) {
-        //  switch(self) {
-        //    TagBranch {
-        //      dumb :=  new TagBranch();
-        //      unsafe {
-        //        dumb = self
-        //        dumb.add_child(child, create_attrib)
-        //      }
-        //    }
-        //    else {}
-        //  }
-        //}
 
 
 

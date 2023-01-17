@@ -29,7 +29,7 @@ namespace Templification.Tags {
                 sub_source   = source[findex..special_groups[(i * 2)].start];
                 if (sub_source != "\n" ) {
                     var mmatchs = any_ex.Matches(sub_source).ToList();
-                    c_groups  =  Attribs.make_location_groups(mmatchs, findex, sub_source.Length);
+                    c_groups  =  TagGroup.make_location_groups(mmatchs, findex, sub_source.Length);
                     tag_groups.AddRange(c_groups);
                 }
                 tag_groups.Add(special_groups[i * 2]);
@@ -38,7 +38,7 @@ namespace Templification.Tags {
             }
             sub_source = source[findex..source.Length];
             var csharpMatches = any_ex.Matches(sub_source).ToList();
-            c_groups = Attribs.make_location_groups(csharpMatches, findex, sub_source.Length);
+            c_groups = TagGroup.make_location_groups(csharpMatches, findex, sub_source.Length);
             tag_groups.AddRange(c_groups);
 
             var tag_array = collect_tags(source, tag_groups);
