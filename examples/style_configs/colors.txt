@@ -11,10 +11,10 @@ info:#0074C7
 warning:#FFA538
 light:#71C5E8
 neutral-5:#383838
-nuetral-4:#7E7E7E
-nuetral-3:#C4C4C4
-nuetral-2:#ECECEC
-nuetral-1:#edf2f7
+neutral-4:#7E7E7E
+neutral-3:#C4C4C4
+neutral-2:#ECECEC
+neutral-1:#edf2f7
 loader-background-color:#F1F2F4
 loader-color:#005C9E
 tooltip-background-dark:#000

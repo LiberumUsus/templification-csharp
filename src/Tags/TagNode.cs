@@ -692,6 +692,7 @@ namespace Templification.Tags {
                     }
                 }
             }
+            remove_list.Reverse();
             foreach (var i in remove_list ) {
                 var ctag     =  this.children[i].tag;
                 var tag_type =  ctag.tag_type;
