@@ -105,12 +105,17 @@ namespace Templification.Tags {
                     continue;
                 }
                 if (attrib.type != AttribType.variable ) {
+                    // OVERRIDE ATTRIB COMPLETELY
                     if (!this.attribs.ContainsKey(key) || attrib.options.Contains("o") ) {
                         this.attribs[key] = attrib;
+                    // DELETE ATTRIB IN TARGET
                     } else if (attrib.options.Contains("d") ) {
                         this.attribs.Remove(key);
                     } else if (mergeable.ContainsKey(key) ) {
                         var attrib_value  =  this.attribs[key].value;
+                        // OVERRIDE EXISTING CLASSES THAT HAVE MATCHING PREFIXES
+                        // E.G. class%t="border-2" ==> template: class="border-1"
+                        // final result is: class="border-2" ... NOT: class="border-1 border-2"
                         if (attrib.options.Contains("t") ) {
                             var new_value  =  Utils.Utils.replace_class_with_prefix(this.attribs[key].value, attrib.value);
                             this.attribs[key].value = new_value;

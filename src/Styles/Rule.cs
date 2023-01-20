@@ -53,7 +53,9 @@ namespace Templification.Styles {
         }
 
         public string str() {
-            //(self Rule)
+
+            if (this.key.StartsWith('@')) return "";
+
             if (string.IsNullOrEmpty(this.key)) return "";
             return this.key + " : "+ this.rvalue + (this.IsImportant ? " !important" : "") + ";";
         }

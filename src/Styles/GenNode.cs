@@ -107,8 +107,8 @@ namespace Templification.Styles {
                         var vdirs =  new List<string>();
                         var vdir  =  matches.Groups["dir"].Value;
                         foreach (var cdir in vdir ) {
-                            if (gen_list.locations[cdir.ToString()].Contains("|") ) {
-                                foreach (var subs in gen_list.locations[cdir.ToString()].Split("|") ) {
+                            if (gen_list.locations[cdir.ToString()].Contains('|') ) {
+                                foreach (var subs in gen_list.locations[cdir.ToString()].Split('|') ) {
                                     vdirs.Add(subs);
                                 }
 

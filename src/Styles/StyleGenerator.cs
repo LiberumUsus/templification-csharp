@@ -83,7 +83,7 @@ namespace Templification.Styles {
                 value = "font",
                 children = new List<GenNode>{
                     new SubstNode{
-                        value = new List<string>{@"(?<value>\d+)"},
+                        value = new List<string>{@"^(?<value>\d+)"},
                         autounit = false,
                         rules = new List<Rule>{new Rule{
                                 key = "font-weight",
@@ -91,7 +91,7 @@ namespace Templification.Styles {
                             }}
                         },
                     new SubstNode {
-                        value = new List<string>{@"h-(?<value>\d+)(?<unit>\S*)?"},
+                        value = new List<string>{@"^h-(?<value>\d+)(?<unit>\S*)?"},
                             autounit = true,
                             rules = new List<Rule>{new Rule{
                                 key = "font-size",
@@ -222,14 +222,14 @@ namespace Templification.Styles {
                     }},
                 children = new List<GenNode>{
                     new SubstNode{
-                        value = new List<string>{@"(?<dir>[tlrbxy]+)-(?<value>\d+)(?<unit>\S*)?"},
+                        value = new List<string>{@"^(?<dir>[tlrbxy]+)-(?<value>\d+)(?<unit>\S*)?"},
                         rules = new List<Rule>{new Rule{
                                 key = "{base}-{dir}",
                                 rvalue = "{value}"
                             }}
                         },
                     new SubstNode{
-                        value = new List<string>{@"(?<value>\d+)(?<unit>\S+)?"},
+                        value = new List<string>{@"^(?<value>\d+)(?<unit>\S+)?"},
                         rules = new List<Rule>{new Rule{
                                 key = "{base}",
                                 rvalue = "{value}"
