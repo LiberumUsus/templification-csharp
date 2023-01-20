@@ -384,6 +384,8 @@ namespace Templification.Tags {
             var watchers     = new List<Watcher>();
             var watcherTypes = new Dictionary<string, TagSubType>();
 
+            watchers.Add(cswatcher);
+            watcherTypes.Add("cshtml", TagSubType.cshtml);
             watchers.Add(new Watcher("filedetails", "<!TEMPLIFICATION> </!TEMPLIFICATION> \\", true));
             watcherTypes.Add("filedetails", TagSubType.filedetails);
             watchers.Add(new Watcher("script", "<script*> </script> \\", true).offsets(1, 0));
