@@ -15,36 +15,19 @@ namespace Templification.Styles {
                 uid = rand.Next()
             };
 
+            var cwatcher    = new Watcher("comment", "/\\* \\*/ \\").offsets(-1, 0);
+            var cmd_watcher = new Watcher("cmds", "@ ; \\");
+            var swatcher    = new Watcher("string", "\" \" \\");
+            var bwatcher    = new Watcher("block", "{ } \\");
+                bwatcher.can_nest = true;
 
-            var cwatcher  = new Watcher();
-            cwatcher.init("comment", "/\\* \\*/ \\");
-            cwatcher.offsets(-1, 0);
-            cwatcher.reporting = false;
-
-            var swatcher  = new Watcher();
-            swatcher.init("string", "\" \" \\");
-            swatcher.reporting = false;
-
-            var bwatcher  = new Watcher();
-            bwatcher.init("block", "{ } \\");
-            bwatcher.can_nest = true;
-            bwatcher.reporting = false;
-
-            var rwatcher  = new Watcher();
-            rwatcher.init("rule", ": ; \\");
+            var rwatcher  = new Watcher("rule", ": ; \\");
             rwatcher.active = false;
             rwatcher.must_confirm = true;
-            rwatcher.reporting = false;
 
-            var nwatcher  = new Watcher();
-            nwatcher.init("name", "} { \\");
-            nwatcher.offsets(1, -1);
+            var nwatcher  = new Watcher("name", "} { \\").offsets(1, -1);
             nwatcher.set_start(0, WatchStage.second);
-            nwatcher.reporting = false;
 
-            var cmd_watcher  = new Watcher();
-            cmd_watcher.init("cmds", "@ ; \\");
-            cmd_watcher.reporting = false;
 
             var watchers        =  new List<Watcher>{cwatcher, swatcher, nwatcher, bwatcher, rwatcher, cmd_watcher};
             var style_sheet_id  =  rand.Next();

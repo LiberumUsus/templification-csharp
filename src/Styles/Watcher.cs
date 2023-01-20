@@ -9,75 +9,6 @@ namespace Templification.Styles {
         second,
     }
 
-    public class WatchSegment {
-
-        public string value = "";
-        public int    index;
-        public int    offset;
-        public int    matches;
-        public int    chrmatched;
-        public bool   indexouter;
-
-
-        public bool consume(char chr, bool insensitive) {
-            //(self WatchSegment)
-            if (this.value.Length == 0 ) {
-                return false;
-            }
-            // Clear matches if starting fresh
-            if (this.index == -1 ) {
-                this.index = 0;
-                this.chrmatched = 0;
-            }
-
-            var vindex  = this.special_char_check();
-            var matched = false;
-
-            if (this.value[vindex] == chr
-                || (insensitive && this.value.ToLower()[vindex] == chr)
-                || (insensitive && this.value.ToUpper()[vindex] == chr) ) {
-                this.chrmatched += 1;
-                if (vindex > this.index ) {
-                    this.index += 1;
-                }
-                this.index += 1;
-                matched = (this.index == this.value.Length);
-                if (matched ) {
-                    this.matches += 1;
-                }
-            } else if (this.index < vindex ) {
-                this.chrmatched += 1;
-            } else {
-                // Reset index anytime a match fails
-                // matches must be continuous
-                this.index = -1;
-            }
-            if (this.index >= this.value.Length ) {
-                this.index = -1;
-            }
-            return matched;
-        }
-
-        int special_char_check() {
-            //(self WatchSegment)
-            var return_index  =  this.index;
-
-            if (this.value[this.index] == '\\' ) {
-                if (this.index + 1 < this.value.Length && this.value[this.index + 1] == '*' ) {
-                    this.index += 1;
-                    return_index = this.index;
-                }
-            }
-            if ((this.value[this.index] == '*' && this.index == 0)
-                || (this.value[this.index] == '*' && this.value[this.index - 1] != '\\') ) {
-                if ((this.index - 1 >= 0 && this.value[this.index - 1] != '\\') || this.index - 1 == -1 ) {
-                    return_index = this.index + 1;
-                }
-            }
-            return return_index;
-        }
-    }
-
 
     public class Watcher {
 
@@ -94,9 +25,51 @@ namespace Templification.Styles {
         public bool can_nest     {get; set;} = false;
         public bool must_confirm {get; set;} = false;
         public bool insensitive  {get; set;} = false;
-        public bool reporting    {get; set;} = true;
+        public bool reporting    {get; set;} = false;
         public bool debug        {get; set;} = false;
         public string name = "";
+
+        public Watcher(){}
+
+        public Watcher(string name, string watchStrings, bool includeOuter = false, bool autoinit = true) {
+            this.init(name, watchStrings);
+            this.useouter(includeOuter);
+        }
+
+
+        public Watcher init(string watcherName, string strings) {
+            this.name     = watcherName;
+            this.active   = true;
+            this.matches  = new List<Bounds>();
+            this.mlengths = new List<Bounds>();
+            this.can_nest = false;
+
+            var parts  =  strings.Split(" ");
+
+            if (parts.Length > 0 ) {
+                this.begin_chr = new WatchSegment {
+                    value = parts[0],
+                    index = 0
+                };
+            }
+            if (parts.Length > 1 ) {
+                this.end_chr = new WatchSegment {
+                    value = parts[1],
+                    index = 0
+                };
+                this.can_nest = this.end_chr.value == this.begin_chr.value;
+            }
+            if (parts.Length > 2 ) {
+                this.escape = new WatchSegment {
+                    value = parts[2],
+                    index = 0
+                };
+            }
+            if (parts.Length > 3 ) {
+                this.ignore = parts[3];
+            }
+            return this;
+        }
 
 
         public List<Utils.Bounds> consume(char chr, int index) {
@@ -292,48 +265,15 @@ namespace Templification.Styles {
             return this;
         }
 
-        public void offsets(int start_offset, int end_offset) {
-            //(self Watcher)
+        public Watcher offsets(int start_offset, int end_offset) {
             this.begin_chr.offset = start_offset;
             this.end_chr.offset = end_offset;
+            return this;
         }
 
-        public void useouter(bool use) {
-            //(self Watcher)
-            this.begin_chr.indexouter = true;
-            this.end_chr.indexouter = true;
-        }
-
-        public Watcher init(string name, string strings) {
-            //(self Watcher)
-            this.name = name;
-            this.active = true;
-            this.matches = new List<Bounds>();
-            this.mlengths = new List<Bounds>();
-            this.can_nest = false;
-            var parts  =  strings.Split(" ");
-            if (parts.Length > 0 ) {
-                this.begin_chr = new WatchSegment {
-                    value = parts[0],
-                    index = 0
-                };
-            }
-            if (parts.Length > 1 ) {
-                this.end_chr = new WatchSegment {
-                    value = parts[1],
-                    index = 0
-                };
-                this.can_nest = this.end_chr.value == this.begin_chr.value;
-            }
-            if (parts.Length > 2 ) {
-                this.escape = new WatchSegment {
-                    value = parts[2],
-                    index = 0
-                };
-            }
-            if (parts.Length > 3 ) {
-                this.ignore = parts[3];
-            }
+        public Watcher useouter(bool use) {
+            this.begin_chr.indexouter = use;
+            this.end_chr.indexouter = use;
             return this;
         }
 

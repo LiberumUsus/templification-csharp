@@ -364,43 +364,25 @@ namespace Templification.Tags {
         public static List<TagGroup> collect_preprocess_blocks(string source, CmdLineOptions options) {
             var out_tags  =  new List<TagGroup>();
 
-            var script_start =  "<script*>";
-            var script_end   =  "</script>";
-
-            var void_start   =  "<void_exact>";
-            var void_end     =  "</void_exact>";
-
-            var cs_start     =  @"@Html";
-            var cs_end       =  ")";
-
-            var swatcher  = new Watcher();
-            swatcher.init("script", script_start + " " + script_end + " \\");
-            swatcher.useouter(true);
-            swatcher.offsets(1, 0);
-            swatcher.reporting = false;
-
-            var vwatcher  = new Watcher();
-            vwatcher.init("void", void_start + " " + void_end + " \\");
-            vwatcher.useouter(true);
-            vwatcher.offsets(1, 0);
-            vwatcher.reporting = false;
-
-            var comwatcher  = new Watcher();
-            comwatcher.init("comments", "<!-- --> \\");
-            comwatcher.useouter(true);
-            comwatcher.offsets(0, 0);
-
-            var cswatcher  = new Watcher();
-            cswatcher.init("cshtml", cs_start + " " + cs_end + " \\");
-            cswatcher.useouter(true);
+            var cswatcher  = new Watcher("cshtml", "@Html ) \\", true);
             cswatcher.insensitive = true;
-            cswatcher.reporting   = true;
             cswatcher.active      = options.preprocess_razor;
 
-            var watchers = new Watcher[]{swatcher, vwatcher, cswatcher, comwatcher};
+            var watchers     = new List<Watcher>();
+            var watcherTypes = new Dictionary<string, TagSubType>();
+
+            watchers.Add(new Watcher("script", "<script*> </script> \\", true).offsets(1, 0));
+            watcherTypes.Add("script", TagSubType.script);
+            watchers.Add(new Watcher("void", "<void_exact> </void_exact> \\", true).offsets(1, 0));
+            watcherTypes.Add("void", TagSubType.void_exact);
+            var vwatcher = watchers.Last();
+            watchers.Add(new Watcher("comments", "<!-- --> \\", true).offsets(0, 0));
+            watcherTypes.Add("comments", TagSubType.comment);
+            var comwatcher = watchers.Last();
+
             var i = 0;
             foreach (var chr in source ) {
-                foreach (var watch in watchers ) {
+                foreach (var watch in watchers) {
                     var points     = watch.consume(chr, i);
                     var mpoint     = points[0];
                     var match_lens = points[1];
@@ -422,24 +404,6 @@ namespace Templification.Tags {
 
                             var bound  =  watch.pop_match();
                             switch(watch.name) {
-                                case "script": {
-                                    startlen = match_lens.b;
-                                    endlen   = match_lens.d;
-                                    subtype  = TagSubType.script;
-                                    break;
-                                }
-                                case "void": {
-                                    startlen = match_lens.b;
-                                    endlen   = match_lens.d;
-                                    subtype  = TagSubType.void_exact;
-                                    break;
-                                }
-                                case "comments": {
-                                    startlen = match_lens.b;
-                                    endlen   = match_lens.d;
-                                    subtype  = TagSubType.comment;
-                                    break;
-                                }
                                 case "cshtml": {
                                     if (!vwatcher.is_searching() ) {
                                         startlen = match_lens.b;
@@ -451,7 +415,13 @@ namespace Templification.Tags {
                                     break;
                                 }
                                 default: {
-                                    startlen = 0;
+                                    if (watcherTypes.ContainsKey(watch.name)) {
+                                        startlen = match_lens.b;
+                                        endlen   = match_lens.d;
+                                        subtype  = watcherTypes[watch.name];
+                                    } else {
+                                        startlen = 0;
+                                    }
                                     break;
                                 }
                             }
