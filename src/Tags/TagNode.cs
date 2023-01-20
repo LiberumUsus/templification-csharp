@@ -24,6 +24,7 @@ namespace Templification.Tags {
         void_exact,
         cshtml,
         comment,
+        filedetails,
         empty,
     }
 
@@ -107,7 +108,8 @@ namespace Templification.Tags {
                 {"script"     ,true},
                 {"void"       ,true},
                 {"void_exact" ,true},
-                {"style"      ,true}
+                {"style"      ,true},
+                {"!templification" ,true}
             };
 
             if (skip_tags.ContainsKey(this.tag.name.ToLower()) ) {
@@ -152,14 +154,14 @@ namespace Templification.Tags {
         }
 
 
-
         // Replace variables in node with values from orig_node
         // Commonly called after a node has been templatized (templates filled in)
         public void replace_vars(TagBranch orig_node) {
             var skip_tags  = new Dictionary<string,bool> {
                 {"script", true},
                 {"void", true},
-                {"void_exact", true}
+                {"void_exact", true},
+                {"!templification" ,true}
             };
 
             var var_regex        = new Regex("((?<prevar>[^ ]+)[|])?[{](?<vars>[^ ]+)[}]");

@@ -140,6 +140,8 @@ namespace Templification.Tags {
 
             if (tag_start.name.ToLower() == "style" ) {
                 return out_string;
+            } else if (tag_start.name.ToLower() == "!templification" ) {
+                return out_string;
             } else if ( tag_start.attribs.ContainsKey("target") && tag_start.sub_type == TagSubType.script && tag_start.attribs["target"].value != "bundle" ) {
                 return tag_start.to_string(indent);
             } else if ( tag_start.attribs.ContainsKey("target") && tag_start.sub_type == TagSubType.script && tag_start.attribs["target"].value == "bundle" ) {

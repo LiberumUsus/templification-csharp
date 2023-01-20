@@ -60,6 +60,7 @@ namespace Templification.Tags {
         // You have no ability to manage time
         public static List<TagData> create_tag_from_string(string source, TagGroup group) {
             var sub_source  =  source[group.start..group.end];
+            var DetailsTag = "[!]TEMPLIFICATION";
 
             var pat_script_start =  @"(?<wspace>\s*)?<(?<name>script)\s*(?<attribs>.*)>";
             var pat_script_end   =  @"(?<wspace>\s*)?</(?<name>script)\s*>";
@@ -67,13 +68,17 @@ namespace Templification.Tags {
             var pat_tag_end      =  @"(?<wspace>\s*)?</(?<name>\w*)\s*>";
             var pat_tag_single   =  @"(?<wspace>\s*)?<(?<name>\w*)\s*(?<attribs>[^>]*)/>";
             var pat_command      =  @"^(?<space>\s*)?{[#:/](?<name>\w*)\s*(?<attribs>[^><]*)}";
+            var pat_details_start =  @"(?<wspace>\s*)?<(?<name>"+DetailsTag+@")\s*(?<attribs>.*)>";
+            var pat_details_end   =  @"(?<wspace>\s*)?</(?<name>"+DetailsTag+@")\s*>";
 
-            var end_ex          = new Regex(pat_tag_end,      RegexOptions.Singleline); // or panic(err)
-            var single_ex       = new Regex(pat_tag_single,   RegexOptions.Singleline); // or panic(err)
-            var start_ex        = new Regex(pat_tag_start,    RegexOptions.Singleline); // or panic(err)
-            var script_start_ex = new Regex(pat_script_start, RegexOptions.Singleline); // or panic(err)
-            var script_end_ex   = new Regex(pat_script_end,   RegexOptions.Singleline); // or panic(err)
-            var command_ex      = new Regex(pat_command); // or panic(err)
+            var end_ex           = new Regex(pat_tag_end,      RegexOptions.Singleline);
+            var single_ex        = new Regex(pat_tag_single,   RegexOptions.Singleline);
+            var start_ex         = new Regex(pat_tag_start,    RegexOptions.Singleline);
+            var script_start_ex  = new Regex(pat_script_start, RegexOptions.Singleline);
+            var script_end_ex    = new Regex(pat_script_end,   RegexOptions.Singleline);
+            var details_start_ex = new Regex(pat_details_start, RegexOptions.Singleline);
+            var details_end_ex   = new Regex(pat_details_end,   RegexOptions.Singleline);
+            var command_ex       = new Regex(pat_command);
 
             var tags  =  new List<TagData>();
             var tag  = new TagData{
@@ -82,16 +87,18 @@ namespace Templification.Tags {
 
             var was_matched  = false;
             if (group.sub_type != TagSubType.cshtml && group.sub_type != TagSubType.comment) {
-                if (!was_matched) was_matched = attempt_match(TagType.start,  script_start_ex, sub_source, tag);
-                if (!was_matched) was_matched = attempt_match(TagType.end,    script_end_ex,   sub_source, tag);
-                if (!was_matched) was_matched = attempt_match(TagType.single, single_ex,       sub_source, tag);
-                if (!was_matched) was_matched = attempt_match(TagType.start,  start_ex,        sub_source, tag);
-                if (!was_matched) was_matched = attempt_match(TagType.end,    end_ex,          sub_source, tag);
+                if (!was_matched) was_matched = attempt_match(TagType.start,  script_start_ex,  sub_source, tag);
+                if (!was_matched) was_matched = attempt_match(TagType.end,    script_end_ex,    sub_source, tag);
+                if (!was_matched) was_matched = attempt_match(TagType.single, single_ex,        sub_source, tag);
+                if (!was_matched) was_matched = attempt_match(TagType.start,  start_ex,         sub_source, tag);
+                if (!was_matched) was_matched = attempt_match(TagType.end,    end_ex,           sub_source, tag);
+                if (!was_matched) was_matched = attempt_match(TagType.start,  details_start_ex, sub_source, tag);
+                if (!was_matched) was_matched = attempt_match(TagType.end,    details_end_ex,   sub_source, tag);
             }
 
             if (!was_matched && sub_source.Trim().Length > 0 ) {
                 // MAKE THIS SPLIT UP TEXT BASED ON COMMANDS AND CREATE TAGS FOR EACH
-                var cmd_matches  =  command_ex.Matches(sub_source).ToList();
+                var cmd_matches = command_ex.Matches(sub_source).ToList();
 
                 if (cmd_matches.Count > 0 ) {
                     var text_groups  =  Utils.Utils.make_location_groups(cmd_matches, sub_source.Length);
@@ -147,6 +154,8 @@ namespace Templification.Tags {
             return tags;
         }
 
+
+
         public static void process_razor_cmd(string sub_source, TagData tag) {
             var razor_class_pat  = "{\\s*[\"]class[\"]\\s*,\\s*[\"](?<classes>.*)[\"]}";
             var razor_ex  = new Regex(razor_class_pat) ; // or  panic(err)
@@ -191,6 +200,8 @@ namespace Templification.Tags {
                     tag.sub_type = TagSubType.script;
                 } else if (name.ToLower().Trim() == "void_exact" ) {
                     tag.sub_type = TagSubType.void_exact;
+                } else if (name.ToLower().Trim() == "!templification" ) {
+                    tag.sub_type = TagSubType.filedetails;
                 }
 
                 if (wspace.Contains("\n") ) {
@@ -306,7 +317,9 @@ namespace Templification.Tags {
                                 current_node.tag.merge_bounds(tag);
 
                                 // STORE TEXT EXACTLY IF IT IS A SCRIPT TAG
-                                if (current_node.tag.sub_type == TagSubType.script || current_node.tag.sub_type == TagSubType.comment) {
+                                if (current_node.tag.sub_type == TagSubType.script ||
+                                    current_node.tag.sub_type == TagSubType.comment ||
+                                    current_node.tag.sub_type == TagSubType.filedetails) {
                                     current_node.tag.tstr = source[current_node.tag.outer.start..current_node.tag.outer.end];
                                 } else if (current_node.tag.sub_type == TagSubType.void_exact ) {
                                     var vstart  =  current_node.tag.outer.start + 12;
@@ -371,6 +384,8 @@ namespace Templification.Tags {
             var watchers     = new List<Watcher>();
             var watcherTypes = new Dictionary<string, TagSubType>();
 
+            watchers.Add(new Watcher("filedetails", "<!TEMPLIFICATION> </!TEMPLIFICATION> \\", true));
+            watcherTypes.Add("filedetails", TagSubType.filedetails);
             watchers.Add(new Watcher("script", "<script*> </script> \\", true).offsets(1, 0));
             watcherTypes.Add("script", TagSubType.script);
             watchers.Add(new Watcher("void", "<void_exact> </void_exact> \\", true).offsets(1, 0));

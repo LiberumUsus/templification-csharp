@@ -2,6 +2,7 @@ using System.Text;
 
 using Templification.Utils;
 using Templification.Styles;
+using Templification.Data;
 
 namespace Templification.Tags {
 
@@ -10,20 +11,43 @@ namespace Templification.Tags {
 
         public Dictionary<string, StringBuilder> bundled_scripts = new Dictionary<string, StringBuilder>();
 
-        public TagBranch                          root       = new TagBranch();
-        public StyleSheet                         styles     = new StyleSheet();
-        public List<TagBranch>                    in_to_out  = new List<TagBranch>();
-        public Dictionary<string,List<TagBranch>> tag_map    = new Dictionary<string,List<TagBranch>>();
-        public Dictionary<string,List<TagBranch>> slot_map   = new Dictionary<string,List<TagBranch>>();
-        public Dictionary<string,bool>            class_list = new Dictionary<string,bool>();
-
+        public TagBranch                          root        = new TagBranch();
+        public StyleSheet                         styles      = new StyleSheet();
+        public List<TagBranch>                    in_to_out   = new List<TagBranch>();
+        public Dictionary<string,List<TagBranch>> tag_map     = new Dictionary<string,List<TagBranch>>();
+        public Dictionary<string,List<TagBranch>> slot_map    = new Dictionary<string,List<TagBranch>>();
+        public Dictionary<string,bool>            class_list  = new Dictionary<string,bool>();
+        public FileDetails?                       fileDetails = null;
 
 
 
         // INITIALIZE THE TAG TREE WITH A ROOT NODE
         public void init(TagBranch root) {
-            //(self TagTree)
             this.root = root;
+            // Populate fileDetails from tag if it exists
+            setFileDetails(this.root);
+        }
+
+
+
+        private void setFileDetails(TagBranch node) {
+            // Only set it the first time
+            if (node.tag.sub_type == TagSubType.filedetails && fileDetails == null) {
+                this.fileDetails = new FileDetails();
+                var details = node.tag.tstr;
+                var lines   = details.Split("\n");
+                foreach (var line in lines) {
+                    var parts = line.Split("=");
+                    if (parts[0].ToLower().Trim() == "fileoutname" && parts.Length > 1) {
+                        this.fileDetails.FileOutName = parts[1].Trim();
+                    }
+                }
+            }
+            if (this.fileDetails == null) {
+                foreach (var child in node.children) {
+                    setFileDetails(child);
+                }
+            }
         }
 
 
@@ -32,7 +56,8 @@ namespace Templification.Tags {
             //(self TagTree)
             var new_tree  = new TagTree {
                 root   = this.root.clone(),
-                styles = this.styles.clone()
+                styles = this.styles.clone(),
+                fileDetails = this.fileDetails != null ? this.fileDetails.clone() : null
             };
             new_tree.index_tags();
             new_tree.index_slots();

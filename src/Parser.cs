@@ -141,6 +141,12 @@ namespace Templification {
                 var ifile_path  =  trim_path_prefix_add_ext(source_file.get_path(), cmd_line_options.in_dir, cmd_line_options.out_ext);
                 var output_path =  cmd_line_options.out_dir + ifile_path;
 
+                if (tag_tree.fileDetails != null) {
+                    if (!string.IsNullOrEmpty(tag_tree.fileDetails.FileOutName)) {
+                        output_path = cmd_line_options.out_dir + tag_tree.fileDetails.FileOutName + "." + cmd_line_options.out_ext;
+                    }
+                }
+
                 // Test mode fake write or actual write below
                 if (cmd_line_options.test_mode && cmd_line_options.debug_mode) {
                     Console.WriteLine(" [DEBUG] "+ "[test-mode]");
