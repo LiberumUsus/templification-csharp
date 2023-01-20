@@ -17,23 +17,121 @@
  .article {
  }
 </style>
-<div>
-    <div class="myflex mt-10 box-border">
-        <!-- ALL DEFAULTS -->
-        <ContactCard/>
-        <!-- ALL REPLACED -->
-        <ContactCard {addr}="enabled">
-	        <span id="hello" slot="named" class%t="btn-primary-2">Custom Name</span>
-            <div slot="content" class="maxw-250">
-                <h2>All content replaced</h2>
-                <p>Via "content" slot</p>
-                Max width set via content class
-                Styles seem wrong... but maybe not
+<div class="flex flex-col gap-y-4">
+    <div>
+        <h2 class="text-lg font-bold text-slate-500">Slots by Example</h2>
+        <p>All examples below are simplified in some way so as to make the examples readable. Actual usage maybe more involved than shown.</p>
+        <p class="mt-2">
+            Not shown in these examples is the concept of a <b class="mx-2"><i>default</i></b> slot.
+            See menu item <b class="mx-2 text-slate-500"><i>Slots and Defaults</i></b>for more information.
+        </p>
+    </div>
+    <ExampleSection>
+        <div slot="code">
+            <h3>Default Template Used</h3>
+            &lt;ContactCard  /&gt;
+            <div class="mt-4 text-gray-500 text-sm flex">*<span class="ml-2">Look in source code to see <br/>template contents</span></div>
+        </div>
+        <div slot="example">
+            <!-- ALL DEFAULTS -->
+            <ContactCard  />
+        </div>
+    </ExampleSection>
+    <ExampleSection>
+        <div slot="code">
+            <h3>Replacing Contact Name</h3>
+            &lt;ContactCard&gt;
+            <div class="ml-4">
+            &lt;span slot="contactName"
+            <div class="ml-3r">
+                &nbsp;class="bg-teal-500 px-2 rounded-4"&gt;
             </div>
+            <span class="ml-3r">Custom Name</span><br/>
+            &lt;/span&gt;
+            </div>
+            &lt;/ContactCard &gt;
+        </div>
+        <div slot="example">
+        <!-- NAME REPLACED -->
+        <ContactCard>
+	          <span slot="contactName" class="bg-teal-500 px-2 rounded-4">Custom Name</span>
         </ContactCard>
-        <!-- ALL USED -->
-        <ContactCard {addr}="enabled" {name-class}="bg-gray-400">
-	        <span id="hello" onclick="say_hello(this)" slot="named">
+        </div>
+    </ExampleSection>
+    <ExampleSection>
+        <div slot="code">
+            <h3>Multiple Slot Assignments</h3>
+            &lt;ContactCard&gt;
+            <div class="ml-4">
+	              &lt;p slot="address"&gt;100 West St&lt;/p&gt;<br/>
+	              &lt;p slot="address"&gt;Apt. 30&lt;/p&gt;
+            </div>
+            &lt;/ContactCard &gt;
+        </div>
+        <div slot="example">
+            <!-- SOME USED -->
+            <ContactCard>
+	              <span slot="contactName" class="">Multiple Elems to Single Slot</span>
+	              <p slot="address" class="text-slate-700">100 West St.</p>
+	              <p slot="address" class="text-slate-700">Apt. 30</p>
+            </ContactCard>
+        </div>
+    </ExampleSection>
+    <ExampleSection>
+        <div slot="code">
+            <h3>Tag name to slot</h3>
+            &lt;ContactCard&gt;
+            <div class="ml-4">
+                &lt;Email&gt;replaced@by.tagname&lt;/Email&gt;<br/>
+                &lt;Email&gt;replaced@by.tagname.twice&lt;/Email&gt;
+            </div>
+            &lt;/ContactCard &gt;
+            <div class="mt-4 text-gray-500 text-sm flex">
+                *<span class="ml-2">Slots will match to tags with matching name. <br/>
+                The tag name does NOT have to match an existing<br/>template or valid html tag name.</span>
+            </div>
+        </div>
+        <div slot="example">
+            <!-- DIFFERENT -->
+            <ContactCard>
+	              <span slot="contactName" class="">Slot Replacement By Tag Name</span>
+                <Email>replaced@by.tagname</Email>
+                <Email>replaced@by.tagname.twice</Email>
+            </ContactCard>
+        </div>
+    </ExampleSection>
+    <ExampleSection>
+        <div slot="code">
+            <h3>All Slots Replaced</h3>
+            &lt;ContactCard&gt;<br/>
+            <div class="ml-4">
+	              &lt;span slot="contactName"&gt;<br/>
+                <div class="ml-4">
+                    &lt;Button&gt;P. Sherman&lt;/Button&gt;<br/>
+                </div>
+                &lt;/span&gt;<br/>
+	          &lt;p slot="address"&gt;42 Wallaby Way&lt;br/&gt;Sydney&lt;/p&gt;<br/>
+                &lt;span slot%s="email"&gt;
+                <div class="ml-4">
+                    component@styles.here
+                </div>
+                &lt;/span&gt;<br/>
+                &lt;div slot="notes"&gt;
+                <div class="ml-4">
+                    Name replaced with button, not just text
+                </div>
+                &lt;/div&gt;<br/>
+                &lt;div slot="footer"&gt;*Footer is present&lt;/div&gt;<br/>
+            </div>
+            &lt;/ContactCard&gt;<br/>
+            <div class="mt-4 text-gray-500 text-sm flex">
+                *<span class="ml-2">Class and other info removed for clarity</span>
+            </div>
+        </div>
+        <div slot="example">
+            <!-- ALL USED -->
+            <ContactCard {addr}="enabled" {name-class}="bg-gray-400">
+	        <span id="hello" onclick="say_hello(this)" slot="contactName">
                 <Button {default}="P. Sherman" class%t="btn-primary-1 bordered btn">Hello</Button>
             </span>
 	        <p slot="address" {extra}="www.google.com">
@@ -41,25 +139,31 @@
 		        Sydney
 	        </p>
             <span id="hmail" slot%s="email">component@styles.here</span>
-            <div slot="description" class="text-sm">Name replaced with button, not just text</div>
+            <div slot="notes" class="text-sm">Name replaced with button, not just text</div>
             <div slot="footer">*Footer is present</div>
         </ContactCard>
-    </div>
-    <div class="myflex mt-10 box-border">
-        <!-- SOME USED -->
-        <ContactCard {name-class}="bg-gradient-to-r from-slate-700 via-slate-500 to-slate-400" class="bg-gradient-to-r from-green-500 via-cyan-300 to-gray-200">
-	        <span slot="named" class="">Multiple Elems to Single Slot</span>
-	        <p slot="address" class="text-slate-700">100 Address 1 from elem 1</p>
-	        <p slot="address" class="text-slate-700">200 Address 2 from elem 2</p>
-            <Email>replaced@by.tagname</Email>
-            <div slot="footer" class="text-indigo-600">Class color override</div>
-        </ContactCard>
-        <!-- DIFFERENT -->
-        <ContactCard>
-	        <span slot="named" class="">Slot Replacement</span>
-	        <p slot%s="address">100 Address 1 from elem 1</p>
-            <Email>replaced@by.tagname</Email>
-            <Email>replaced@by.tagname.twice</Email>
-        </ContactCard>
-    </div>
+        </div>
+    </ExampleSection>
+    <ExampleSection>
+        <div slot="code">
+            <h3>Fun Example</h3>
+            &lt;ContactCard&gt;<br/>
+            ...<br/>
+            &lt;/ContactCard&gt;<br/>
+            <div class="mt-4 text-gray-500 text-sm flex">
+                *<span class="ml-2">No details shown, check source code</span>
+            </div>
+        </div>
+        <div slot="example">
+            <!-- SOME USED -->
+            <ContactCard {name-class}="bg-gradient-to-r from-slate-700 via-slate-500 to-slate-400" class="bg-gradient-to-r from-green-500 via-cyan-300 to-gray-200">
+	              <span slot="contactName" class="">Fun Example</span>
+	              <p slot="address" class="text-slate-700">100 Address 1 from elem 1</p>
+	              <p slot="address" class="text-slate-700">200 Address 2 from elem 2</p>
+                <Notes class="text-white">There is no notes template, shock!</Notes>
+                <Email><a class="text-white bg-slate-400 px-4" slot="email" href="mailto: replaced@by.tagname">replaced@by.tagname</a></Email>
+                <div slot="footer" class="text-indigo-600">Class color override</div>
+            </ContactCard>
+        </div>
+    </ExampleSection>
 </div>

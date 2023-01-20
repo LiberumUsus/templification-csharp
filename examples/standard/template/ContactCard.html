@@ -24,7 +24,7 @@
 </style>
 <article class="contact-card">
 	<h2 class="text-white font-bold bg-primary rounded-trtl-19 px-4 mb-2 py-2 {name-class}">
-		<slot name="named">
+		<slot name="contactName">
 			<span>All Defaults</span>
 		</slot>
 	</h2>
@@ -36,9 +36,9 @@
 	        <div class="email">
 		        <slot name="email"><span>default@addrs.comp</span></slot>
 	        </div>
-            <div depends="description" class="description">
+            <div depends="notes" class="description">
                 <h3 class="font-600">Notes:</h3>
-                <slot name="description"></slot>
+                <slot name="notes"></slot>
             </div>
             <div depends="footer" class="text-red-400 text-sm border-tr-2 border-rose-500 rounded-tr-10 mt-2">
                 <slot name="footer"/>

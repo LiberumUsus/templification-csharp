@@ -1,4 +1,5 @@
 <style>
+ @style-id: 303;
  code {
      @local true;
      @apply text-blue-800 px-2 bg-orange-200 text-base;
@@ -14,34 +15,64 @@
  }
 </style>
 <div>
-    <Paper class="lines box">
-        <h2 class="w-full text-lg text-slate-700 mt-1">
-            <a href="#endpage">STYLES</a>
-        </h2>
+    <Paper class="minh-0 bg-slate-300" {date-class}="text-blue-400">
+        <h2 class="w-full text-lg text-slate-700 mt-1">STYLE ASSIGNMENT</h2>
         <hr class="mb-2px" />
         <hr/>
-        <div class="text-blue-800 mt-2">
-            <p class="standardp-font" style="margin-top:26px;">
-                Styles can be assigned in a number of ways. They can be applied via CSS stylesheets,
-                via <b> &lt;style&gt;</b> blocks or within the <b><i> `class`</i></b> attribute.
+        <p class="" style="margin-top:26px;">
+            Styles can be assigned in a number of ways. They can be applied via CSS stylesheets,
+            via <b> &lt;style&gt;</b> blocks or within the <b><i> `class`</i></b> attribute.
+        </p>
+        <p>&nbsp;</p>
+        <p class="">
+            Within each of these areas,&nbsp;<u>except</u> the <b><i> `class`</i></b> attribute, the </b><b> @apply</b> command can be used so that
+            styles are generated based on predefined CSS rules.
+        </p>
+        <ExampleSection {title-class}="ml-0 bg-white" {content-class}="rounded-tl-0 bg-white">
+            <div slot="title">Apply Attribute</div>
+            <div slot="code" class="text-black">
+                <h3>Style Entry</h3>
+                &lt;style&gt;
+                <div class="ml-4">
+                .myClass {
+                <div class="ml-4">@apply w-20 px-4;</div>
+                }
+                </div>
+                &lt;/style&gt;
+            </div>
+            <div slot="example">.myClass {
+                <p class="ml-4">
+                    width: 20px;<br/>
+                    padding-right: 1rem;<br/>
+                    padding-left: 1rem;<br/>
+                </p>
+                }</div></div>
+        </ExampleSection>
+    </Paper>
+    <Paper class="minh-0 bg-steelblue" {date-class}="embossed-text text-slate-400">
+        <h2 class="w-full text-lg mt-1 text-white">STYLE GENERATION</h2>
+        <hr class="text-white mb-2px" />
+        <hr class="text-white" />
+            <p class%t="text-white mt-4">
+                Some styles can be generated from the class name.<br/>For example &nbsp;<code>border-b-3</code> instructs
+                the program to generate a border on the bottom of the element that is <b> 3px</b> in width.
             </p>
-            <p>&nbsp;</p>
-            <p class="standardp-font">
-                Within each of these areas,&nbsp;<u>except</u> the <b><i> `class`</i></b> attribute, the </b><b> @apply</b> command can be used so that
-                styles are generated based on predefined CSS rules.
-            </p>
-            <p class%t="font-tangerine-regular text-purple-700 border-b-3 border-purple-400 lines-font mt-34px">
-                Some styles can be generated from the class name. For example &nbsp;<code class="font-h-20px">border-b-3</code> instructs
-                the program to generate a border on the bottom of the element that is <b> 3px</b> in width. More information on
-                this can be found under the <b><i> Generated Classes</i></b> section.
-            </p>
-            <p class="mt-4 text-rose-500 mt-24px">
+            <p class="mt-4 text-white">
                 Colors, among many others, are another type of style that can be generated. Colors can be applied
                 to many different class rules such as&nbsp;<code class="rose-code">color, background, border, decorations</code> etc.
                 The colors are loaded via a&nbsp;<code class="rose-code">colors.txt</code> file and the user can add any name/color combination they wish.
                 Or the color can be specified via hex code like this&nbsp;<code class="rose-code text-A355A5">text-A355A5</code>.
             </p>
-            <p class="text-green-700 mt-26px text-lg">
+            <p class="mt-4 text-white">More information on this can be found under the <b><i> Generated Classes</i></b> section.</p>
+    </Paper>
+    <Paper class="lines box">
+        <h2 class="w-full text-lg text-slate-700 mt-1">
+            <a href="#endpage">STYLE OVERRIDING</a>
+        </h2>
+        <hr class="mb-2px" />
+        <hr/>
+        <div class="text-green-700 mt-2">
+            <p class="mt-26px text-lg">
                 The class attribute can be overriden in many cases when a template is being used. In this way
                 the template can have a default set of classes and also allow for the individual implementations
                 to override the  default class attribute. By default, attributes are merged not overridden, but by
@@ -111,12 +142,6 @@
                     are applied the <b> code</b> block would override any similar rules in <b> existing-class</b>. Generally speaking the tag
                     styles (i.e. code) should come before any local classes to be applied to &lt;code&gt; blocks.</p>
             </div>
-        </div>
-    </Paper>
-    <Paper id="paper3" {date}="2021-11-03 embossed" {date-class}="embossed-text text-f0d7b7">
-        <div class="standardp-font" @tag="p" @separator="\n">This is probably no better :(
-            I guess this will work
-            Impatient mode is great, but man its slow too.
         </div>
     </Paper>
     <div id="endpage">_</div>

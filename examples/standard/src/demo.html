@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<!TEMPLIFICATION>
+  FileOutName = DEMO
+</!TEMPLIFICATION>
 <html>
     <head>
         <link rel="stylesheet" href="./bundle.css"/>
@@ -89,7 +92,7 @@
  }
 </script>
 
-<body>
+<body class="mb-8">
     <div class="flex gap-4 list-none box-border minh-540">
         <Menu id="Menu" style="font-family: Jost, sans-serif;"
               class="p-4 minw-300 text-white bg-primary border-blr-2 rounded-br-10 rounded-bl-30 border-gray">
@@ -97,31 +100,29 @@
                 <div class="mt-2">menu</div>
             </span>
         <MenuItem type="empty"><input class="searchbox" type="text" id="search" placeholder="Search... (does nothing)" autocomplete="off"></MenuItem>
-        <MenuItem class="pl-4" type="submenu">demo
-            <MenuItem class="ml-4 text-white selected" onclick="showSection(this, 8);">Simple Examples</MenuItem>
-            <MenuItem class="ml-4 text-white" onclick="showSection(this, 6);">TODO</MenuItem>
-            <MenuItem class="ml-4 text-white" onclick="showSection(this, 1);">styles</MenuItem>
-            <MenuItem class="ml-4 text-white" onclick="showSection(this, 2);">slots</MenuItem>
-            <MenuItem class="ml-4 text-white" onclick="showSection(this, 3);">nested_components</MenuItem>
-            <MenuItem class="ml-4 text-white" onclick="showSection(this, 4);">generated classes</MenuItem>
-            <MenuItem class="ml-4 text-white" onclick="showSection(this, 5);">generated html</MenuItem>
-            <MenuItem class="ml-4 text-white" onclick="showSection(this, 7);">logic</MenuItem>
-        </MenuItem>
+        <MenuItem class="ml-4 text-white selected" onclick="showSection(this, 1);">Simple Examples</MenuItem>
+        <MenuItem class="ml-4 text-white" onclick="showSection(this, 2);">TODOs</MenuItem>
+        <MenuItem class="ml-4 text-white" onclick="showSection(this, 3);">Styles</MenuItem>
+        <MenuItem class="ml-4 text-white" onclick="showSection(this, 4);">Slots</MenuItem>
+        <MenuItem class="ml-4 text-white" onclick="showSection(this, 5);">Slots and Defaults</MenuItem>
+        <MenuItem class="ml-4 text-white" onclick="showSection(this, 6);">Generated Classes</MenuItem>
+        <MenuItem class="ml-4 text-white" onclick="showSection(this, 7);">Generated HTML</MenuItem>
+        <MenuItem class="ml-4 text-white" onclick="showSection(this, 8);">Logic</MenuItem>
     </Menu>
     <div id="pages" class="pt-4 w-full box-border pr-8" >
-        <simple_examples id="s8" class="hidden" />
-        <todo_demo id="s6" class="hidden" />
-        <logic_demo id="s7" class="hidden" />
-        <styles_demo id="s1" class="hidden"></styles_demo>
-        <slots_demo id="s2" class="hidden"></slots_demo>
-        <nested_demo id="s3" class="hidden" />
-        <generated_class_demo id="s4" class="hidden" />
-        <generated_html_demo id="s5" class="hidden" />
+        <simple_examples       id="s1" class="hidden" />
+        <todo_demo             id="s2" class="hidden" />
+        <styles_demo           id="s3" class="hidden" />
+        <slots_demo            id="s4" class="hidden" />
+        <nested_demo           id="s5" class="hidden" />
+        <generated_class_demo  id="s6" class="hidden" />
+        <generated_html_demo   id="s7" class="hidden" />
+        <logic_demo            id="s8" class="hidden" />
     </div>
 </div>
 <script src="./bundle.js"></script>
 <script>
- showSection(undefined, 8);
+ showSection(undefined, 1);
 </script>
 </body>
 </html>
