@@ -6,11 +6,18 @@ using Templification.Data;
 
 namespace Templification.Tags {
 
+    public enum TreeType {
+        Standard,
+        SubTemplate
+    }
+
+
     // Tree Structure for operating on TagBranch a root node
     public class TagTree {
 
         public Dictionary<string, StringBuilder> bundled_scripts = new Dictionary<string, StringBuilder>();
 
+        public string                             tree_name   = "";
         public TagBranch                          root        = new TagBranch();
         public StyleSheet                         styles      = new StyleSheet();
         public List<TagBranch>                    in_to_out   = new List<TagBranch>();
@@ -18,6 +25,7 @@ namespace Templification.Tags {
         public Dictionary<string,List<TagBranch>> slot_map    = new Dictionary<string,List<TagBranch>>();
         public Dictionary<string,bool>            class_list  = new Dictionary<string,bool>();
         public FileDetails?                       fileDetails = null;
+        public TreeType                           type        = TreeType.Standard;
 
 
 
@@ -55,8 +63,10 @@ namespace Templification.Tags {
         public TagTree clone() {
             //(self TagTree)
             var new_tree  = new TagTree {
-                root   = this.root.clone(),
-                styles = this.styles.clone(),
+                root        = this.root.clone(),
+                styles      = this.styles.clone(),
+                tree_name   = this.tree_name,
+                type        = this.type,
                 fileDetails = this.fileDetails != null ? this.fileDetails.clone() : null
             };
             new_tree.index_tags();

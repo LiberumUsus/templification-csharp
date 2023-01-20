@@ -7,8 +7,8 @@ namespace Templification.Tags {
     public static class TagParsing {
 
         // Convert html int texto a TagTree
-        public static TagTree parse_html_to_tag_tree(string source, CmdLineOptions options) {
-            var tag_data  =  parse_html_to_tag_data(source, options);
+        public static List<TagTree> parse_html_to_tag_tree(string source, CmdLineOptions options) {
+            var tag_data = parse_html_to_tag_data(source, options);
             return tag_array_to_tag_tree(tag_data, source);
         }
 
@@ -60,22 +60,21 @@ namespace Templification.Tags {
         // You have no ability to manage time
         public static List<TagData> create_tag_from_string(string source, TagGroup group) {
             var sub_source  =  source[group.start..group.end];
-            var DetailsTag = "[!]TEMPLIFICATION";
 
-            var pat_script_start =  @"(?<wspace>\s*)?<(?<name>script)\s*(?<attribs>.*)>";
-            var pat_script_end   =  @"(?<wspace>\s*)?</(?<name>script)\s*>";
-            var pat_tag_start    =  @"(?<wspace>\s*)?<(?<name>[a-zA-Z0-9_\-]+)\s*(?<attribs>.*)>";
-            var pat_tag_end      =  @"(?<wspace>\s*)?</(?<name>\w*)\s*>";
-            var pat_tag_single   =  @"(?<wspace>\s*)?<(?<name>\w*)\s*(?<attribs>[^>]*)/>";
-            var pat_command      =  @"^(?<space>\s*)?{[#:/](?<name>\w*)\s*(?<attribs>[^><]*)}";
-            var pat_details_start =  @"(?<wspace>\s*)?<(?<name>"+DetailsTag+@")\s*(?<attribs>.*)>";
-            var pat_details_end   =  @"(?<wspace>\s*)?</(?<name>"+DetailsTag+@")\s*>";
+            var pat_script_start =  @"(?<"+APP.TAG_SPACE+@">\s*)?<(?<"+APP.TAG_NAME+@">script)\s*(?<"+APP.TAG_ATTRIBS+@">.*)>";
+            var pat_script_end   =  @"(?<"+APP.TAG_SPACE+@">\s*)?</(?<"+APP.TAG_NAME+@">script)\s*>";
+            var pat_tag_start    =  @"(?<"+APP.TAG_SPACE+@">\s*)?<(?<"+APP.TAG_NAME+@">[a-zA-Z0-9_\-]+)\s*(?<"+APP.TAG_ATTRIBS+@">.*)>";
+            var pat_tag_end      =  @"(?<"+APP.TAG_SPACE+@">\s*)?</(?<"+APP.TAG_NAME+@">\w*)\s*>";
+            var pat_tag_single   =  @"(?<"+APP.TAG_SPACE+@">\s*)?<(?<"+APP.TAG_NAME+@">\w*)\s*(?<"+APP.TAG_ATTRIBS+@">[^>]*)/>";
+            var pat_command      =  @"^(?<space>\s*)?{[#:/](?<"+APP.TAG_NAME+@">\w*)\s*(?<"+APP.TAG_ATTRIBS+@">[^><]*)}";
+            var pat_details_start =  @"(?<"+APP.TAG_SPACE+@">\s*)?<(?<"+APP.TAG_NAME+@">"+APP.SUB_TYPE_FILEDETAILS.ToUpper()+@")\s*(?<"+APP.TAG_ATTRIBS+@">.*)>";
+            var pat_details_end   =  @"(?<"+APP.TAG_SPACE+@">\s*)?</(?<"+APP.TAG_NAME+@">"+APP.SUB_TYPE_FILEDETAILS.ToUpper()+@")\s*>";
 
-            var end_ex           = new Regex(pat_tag_end,      RegexOptions.Singleline);
-            var single_ex        = new Regex(pat_tag_single,   RegexOptions.Singleline);
-            var start_ex         = new Regex(pat_tag_start,    RegexOptions.Singleline);
-            var script_start_ex  = new Regex(pat_script_start, RegexOptions.Singleline);
-            var script_end_ex    = new Regex(pat_script_end,   RegexOptions.Singleline);
+            var end_ex           = new Regex(pat_tag_end,       RegexOptions.Singleline);
+            var single_ex        = new Regex(pat_tag_single,    RegexOptions.Singleline);
+            var start_ex         = new Regex(pat_tag_start,     RegexOptions.Singleline);
+            var script_start_ex  = new Regex(pat_script_start,  RegexOptions.Singleline);
+            var script_end_ex    = new Regex(pat_script_end,    RegexOptions.Singleline);
             var details_start_ex = new Regex(pat_details_start, RegexOptions.Singleline);
             var details_end_ex   = new Regex(pat_details_end,   RegexOptions.Singleline);
             var command_ex       = new Regex(pat_command);
@@ -113,7 +112,7 @@ namespace Templification.Tags {
                     }
                 } else {
                     tag.tstr = sub_source;
-                    tag.name = "text";
+                    tag.name = APP.TEXT_NAME;
                     var tsub  =  sub_source.ToLower();
                     // :TODO: MAKE THIS  LESS HACKY
                     if (tsub.Contains("@html") && tsub.Contains("class") ) {
@@ -121,26 +120,26 @@ namespace Templification.Tags {
                     }
                     tag.tag_type = TagType.text;
                     tag.sub_type = group.sub_type;
-                    var index  = sub_source.IndexOf("\n");
+                    var index  = sub_source.IndexOf(APP.TEXT_NEWLINE);
                     if  (index > 0) {
-                        tag.new_line = "\n";
+                        tag.new_line = APP.TEXT_NEWLINE;
                     }
                 }
             } else if (tag.sub_type == TagSubType.cshtml){
                 tag.tstr = sub_source;
-                tag.name = "text";
+                tag.name = APP.TEXT_NAME;
                 var tsub  =  sub_source.ToLower();
                 if (tsub.Contains("class")) {
                     process_razor_cmd(sub_source, tag);
                 }
                 tag.tag_type = TagType.text;
-                var index  = sub_source.IndexOf("\n");
+                var index  = sub_source.IndexOf(APP.TEXT_NEWLINE);
                 if  (index > 0) {
-                    tag.new_line = "\n";
+                    tag.new_line = APP.TEXT_NEWLINE;
                 }
             } else if (tag.tag_type != TagType.text ) {
                 if (group.start == 0 ) {
-                    tag.new_line = "\n";
+                    tag.new_line = APP.TEXT_NEWLINE;
                 }
                 tag.source = source;
                 tag.outer = new Re_group {
@@ -158,7 +157,7 @@ namespace Templification.Tags {
 
         public static void process_razor_cmd(string sub_source, TagData tag) {
             var razor_class_pat  = "{\\s*[\"]class[\"]\\s*,\\s*[\"](?<classes>.*)[\"]}";
-            var razor_ex  = new Regex(razor_class_pat) ; // or  panic(err)
+            var razor_ex  = new Regex(razor_class_pat);
             var rgroups  =  Utils.Utils.make_location_groups(razor_ex.Matches(sub_source).ToList(), 0);
             foreach (var rgroup in rgroups ) {
                 var razormatches = razor_ex.Match(sub_source[rgroup.start..rgroup.end]);
@@ -177,9 +176,9 @@ namespace Templification.Tags {
             var rmatch = regx.Match(block);
             has_match = rmatch.Success;
             if (has_match) {
-                var name       =  rmatch.Groups["name"].Value;
-                var attrib_out =  attrib_str_to_map(rmatch.Groups["attribs"].Value);
-                var wspace     =  rmatch.Groups["wspace"].Value;
+                var name       =  rmatch.Groups[APP.TAG_NAME].Value;
+                var attrib_out =  attrib_str_to_map(rmatch.Groups[APP.TAG_ATTRIBS].Value);
+                var wspace     =  rmatch.Groups[APP.TAG_SPACE].Value;
 
                 tag.name = name;
                 tag.attribs = new Dictionary<string, Attribs>(attrib_out);
@@ -187,25 +186,27 @@ namespace Templification.Tags {
                 foreach (var keyPair in tag.attribs ) {
                     var aname = keyPair.Key;
                     var attr  = keyPair.Value;
-                    if (aname.StartsWith("__") ) {
+                    if (aname.StartsWith(APP.PREFIX_INTERNAL_ATTRIB) ) {
                         tag.internal_attribs[aname] = attr;
                         tag.attribs.Remove(aname);
                     }
                 }
 
                 tag.tag_type = mtype;
-                if (name.ToLower().Trim() == "style" ) {
+                if (name.ToLower().Trim() == APP.SUB_TYPE_STYLE) {
                     tag.sub_type = TagSubType.style;
-                } else if (name.ToLower().Trim() == "script" ) {
+                } else if (name.ToLower().Trim() == APP.SUB_TYPE_SCRIPT) {
                     tag.sub_type = TagSubType.script;
-                } else if (name.ToLower().Trim() == "void_exact" ) {
+                } else if (name.ToLower().Trim() == APP.SUB_TYPE_VOIDEX) {
                     tag.sub_type = TagSubType.void_exact;
-                } else if (name.ToLower().Trim() == "!templification" ) {
+                } else if (name.StartsWith(APP.PREFIX_TEMPLATE)) {
+                    tag.sub_type = TagSubType.template;
+                } else if (name.ToLower().Trim() == APP.SUB_TYPE_FILEDETAILS) {
                     tag.sub_type = TagSubType.filedetails;
                 }
 
-                if (wspace.Contains("\n") ) {
-                    tag.new_line = "\n";
+                if (wspace.Contains(APP.TEXT_NEWLINE) ) {
+                    tag.new_line = APP.TEXT_NEWLINE;
                 }
             }
             return has_match;
@@ -229,7 +230,7 @@ namespace Templification.Tags {
             matches.AddRange(matches2);
 
             if (matches.Count <= 0 ) {
-                var empty_rex  = new Regex("\\s+") ; // or   new regex.RE();
+                var empty_rex  = new Regex("\\s+");
                 matches = empty_rex.Replace(attribs, " ").Split(" ").ToList();
             }
 
@@ -249,13 +250,13 @@ namespace Templification.Tags {
                 } else {
                     value = value.TrimStart(new char[]{'\'','"'}).TrimEnd(new char[]{'\'','"'}).Trim();
                 }
-                var percent_index  = key.IndexOf("%") ; // or  -1
+                var percent_index  = key.IndexOf("%");
                 if (key.StartsWith("@") ) {
                     attr_type = AttribType.command;
                 } else if (percent_index > -1 ) {
                     var key_and_options  =  parts[0].SplitNth("%", 1);
                     key = key_and_options[0].Trim();
-                    options = key_and_options.Length > 1 ? key_and_options[1] : ""; // or  ""
+                    options = key_and_options.Length > 1 ? key_and_options[1] : "";
                 } else if (key.StartsWith("{")) {
                     attr_type = AttribType.variable;
                 } else {
@@ -272,10 +273,10 @@ namespace Templification.Tags {
         }
 
         // Given a tag array that is IN ORDER create a tree based on starts and ends
-        public static TagTree tag_array_to_tag_tree(List<TagData> tags, string source) {
+        public static List<TagTree> tag_array_to_tag_tree(List<TagData> tags, string source) {
             var start_tags   = new Dictionary<string,List<TagBranch>>();
             TagBranch current_node;
-            var final_tree   = new TagTree();
+            var final_trees = new List<TagTree>();
 
             var root = new TagBranch{
                 tag = new TagData {
@@ -291,7 +292,7 @@ namespace Templification.Tags {
                     case TagType.start: {
                         // COLLECT THIS TAG
                         ensure_map_has_array(start_tags, name);
-                        var new_node  = new  TagBranch{
+                        var new_node  = new TagBranch{
                             tag = tag,
                         };
                         new_node.parent = current_node;
@@ -338,10 +339,30 @@ namespace Templification.Tags {
                     default: {break;}
                 }
             }
-//            root.print_all();
-            final_tree.init(root);
-            // If this is an end
-            return final_tree;
+
+            // BREAK UP TEMPLATES FROM TREE IF AT TOP LEVEL
+            for (int i = root.children.Count-1; i >= 0; i--) {
+                var child = root.children[i];
+                if (child.tag.sub_type == TagSubType.template) {
+                    var new_tree = new TagTree();
+                    new_tree.type  = TreeType.SubTemplate;
+                    var template_name = child.tag.name.StartsWith(APP.PREFIX_TEMPLATE) ? child.tag.name.Substring(2) : child.tag.name;
+                    new_tree.tree_name = template_name;
+                    child.tag.name = "root";
+                    child.tag.tag_type = TagType.root;
+                    new_tree.init(child);
+                    final_trees.Add(new_tree);
+                    root.children.RemoveAt(i);
+                }
+            }
+
+            if (root.children.Count > 0) {
+                var final_tree = new TagTree();
+                final_tree.init(root);
+                final_trees.Add(final_tree);
+            }
+
+            return final_trees;
         }
 
         // SUPER SLOPPY ... FIX SOMETIME
@@ -377,7 +398,7 @@ namespace Templification.Tags {
         public static List<TagGroup> collect_preprocess_blocks(string source, CmdLineOptions options) {
             var out_tags  =  new List<TagGroup>();
 
-            var cswatcher  = new Watcher("cshtml", "@Html ) \\", true);
+            var cswatcher  = new Watcher(APP.SUB_TYPE_RAZOR, "@Html ) \\", true);
             cswatcher.insensitive = true;
             cswatcher.active      = options.preprocess_razor;
 
@@ -385,16 +406,20 @@ namespace Templification.Tags {
             var watcherTypes = new Dictionary<string, TagSubType>();
 
             watchers.Add(cswatcher);
-            watcherTypes.Add("cshtml", TagSubType.cshtml);
-            watchers.Add(new Watcher("filedetails", "<!TEMPLIFICATION> </!TEMPLIFICATION> \\", true));
+            watcherTypes.Add(APP.SUB_TYPE_RAZOR, TagSubType.cshtml);
+            var detailsWatchString = "<" + APP.SUB_TYPE_FILEDETAILS.ToUpper() + ">";
+                detailsWatchString += " </" + APP.SUB_TYPE_FILEDETAILS.ToUpper() + "> \\";
+            watchers.Add(new Watcher("filedetails", detailsWatchString, true));
             watcherTypes.Add("filedetails", TagSubType.filedetails);
-            watchers.Add(new Watcher("script", "<script*> </script> \\", true).offsets(1, 0));
-            watcherTypes.Add("script", TagSubType.script);
-            watchers.Add(new Watcher("void", "<void_exact> </void_exact> \\", true).offsets(1, 0));
+            watchers.Add(new Watcher(APP.SUB_TYPE_SCRIPT, "<script*> </script> \\", true).offsets(1, 0));
+            watcherTypes.Add(APP.SUB_TYPE_SCRIPT, TagSubType.script);
+            var voidExWatchString = "<" + APP.SUB_TYPE_VOIDEX.ToUpper() + ">";
+                voidExWatchString += " </" + APP.SUB_TYPE_VOIDEX.ToUpper() + "> \\";
+            watchers.Add(new Watcher("void", voidExWatchString, true).offsets(1, 0));
             watcherTypes.Add("void", TagSubType.void_exact);
             var vwatcher = watchers.Last();
-            watchers.Add(new Watcher("comments", "<!-- --> \\", true).offsets(0, 0));
-            watcherTypes.Add("comments", TagSubType.comment);
+            watchers.Add(new Watcher(APP.SUB_TYPE_COMMENTS, "<!-- --> \\", true).offsets(0, 0));
+            watcherTypes.Add(APP.SUB_TYPE_COMMENTS, TagSubType.comment);
             var comwatcher = watchers.Last();
 
             var i = 0;
@@ -404,7 +429,7 @@ namespace Templification.Tags {
                     var mpoint     = points[0];
                     var match_lens = points[1];
 
-                    if (watch.name == "cshtml" && vwatcher.is_searching() ) {
+                    if (watch.name == APP.SUB_TYPE_RAZOR && vwatcher.is_searching() ) {
                         continue;
                     }
 
@@ -421,7 +446,7 @@ namespace Templification.Tags {
 
                             var bound  =  watch.pop_match();
                             switch(watch.name) {
-                                case "cshtml": {
+                                case APP.SUB_TYPE_RAZOR: {
                                     if (!vwatcher.is_searching() ) {
                                         startlen = match_lens.b;
                                         endlen   = match_lens.d;
@@ -443,7 +468,7 @@ namespace Templification.Tags {
                                 }
                             }
 
-                            if (watch.name == "cshtml" ) {
+                            if (watch.name == APP.SUB_TYPE_RAZOR ) {
                                 out_tags.Add(new TagGroup{
                                         start = mpoint.b + 1,
                                         end = mpoint.d,
@@ -456,7 +481,7 @@ namespace Templification.Tags {
                                         sub_type = subtype,
                                         type = TagType.end,
                                     });
-                            } else if (watch.name == "comments" ) {
+                            } else if (watch.name == APP.SUB_TYPE_COMMENTS ) {
                                 out_tags.Add(new TagGroup{
                                         start = mpoint.b + 1,
                                         end = mpoint.d,

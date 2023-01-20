@@ -43,29 +43,42 @@ namespace Templification.Templates {
             this.template = File.ReadAllText(this.path);
         }
 
-        public void load_and_parse_file(CmdLineOptions options) {
+        public Dictionary<string, TagTree> load_and_parse_file(CmdLineOptions options) {
+            var template_trees = new Dictionary<string, TagTree>();
             // OPERATIONS
             this.template = File.ReadAllText(this.path);
-            this.tag_tree = TagParsing.parse_html_to_tag_tree(this.template, options);
-            this.tag_tree.process_attrib_commands();
-            this.tag_tree.index_commands();
-            if (this.tag_tree.root.locate_default_attrib_merge_tag(0) > 0 ) {
-                this.tag_tree.root.tag.no_merge_attribs = true;
-                if (this.tag_tree.root.children.Count > 0 ) {
-                    this.tag_tree.root.children[0].tag.no_merge_attribs = true;
+            var treeList = TagParsing.parse_html_to_tag_tree(this.template, options);
+            foreach (var tag_tree in treeList) {
+                tag_tree.process_attrib_commands();
+                tag_tree.index_commands();
+                if (tag_tree.root.locate_default_attrib_merge_tag(0) > 0 ) {
+                    tag_tree.root.tag.no_merge_attribs = true;
+                    if (tag_tree.root.children.Count > 0 ) {
+                        tag_tree.root.children[0].tag.no_merge_attribs = true;
+                    }
+                 }
+                tag_tree.index_tags();
+                tag_tree.index_slots();
+                tag_tree.root.parse_style_blocks(true);
+                if (tag_tree.type == TreeType.Standard) {
+                    this.tag_tree = tag_tree;
+                } else {
+                    if (!template_trees.ContainsKey(tag_tree.root.tag.name)) {
+                        template_trees.Add(tag_tree.tree_name.ToLower(), tag_tree);
+                    }
                 }
+                if (this.tag_tree.root.children.Count > 0 ) {
+                    //    this.tag_tree.root.children[0].tag.no_merge_attribs = true;
+                }
+                // COLLECT SCRIPTS FOR BUNDLING
+                this.tag_tree.collect_scripts();
             }
-            this.tag_tree.index_tags();
-            this.tag_tree.index_slots();
-            this.tag_tree.root.parse_style_blocks(true);
             this.apply_local_tags();
-
-            // COLLECT SCRIPTS FOR BUNDLING
-            this.tag_tree.collect_scripts();
             // SET VARS INFO
             var tname = this.name;
-
             this.tag_tree.root.tag.name = tname.ToLower();
+
+            return template_trees;
         }
 
         public void apply_local_tags() {

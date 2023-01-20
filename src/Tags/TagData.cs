@@ -106,10 +106,10 @@ namespace Templification.Tags {
                 }
                 if (attrib.type != AttribType.variable ) {
                     // OVERRIDE ATTRIB COMPLETELY
-                    if (!this.attribs.ContainsKey(key) || attrib.options.Contains("o") ) {
+                    if (!this.attribs.ContainsKey(key) || attrib.options.Contains(APP.ATTRIB_FLAG_OVERRIDE) ) {
                         this.attribs[key] = attrib;
                     // DELETE ATTRIB IN TARGET
-                    } else if (attrib.options.Contains("d") ) {
+                    } else if (attrib.options.Contains(APP.ATTRIB_FLAG_DELETE) ) {
                         this.attribs.Remove(key);
                     } else if (mergeable.ContainsKey(key) ) {
                         var attrib_value  =  this.attribs[key].value;

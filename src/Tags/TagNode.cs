@@ -6,27 +6,6 @@ using Templification.Utils;
 
 namespace Templification.Tags {
 
-    // Tags type enum, for <start> </end> and <single/> style tags
-    public enum TagType {
-        start,
-        end,
-        single,
-        root,
-        text,
-        empty,
-    }
-
-    public enum TagSubType {
-        command,
-        variable,
-        style,
-        script,
-        void_exact,
-        cshtml,
-        comment,
-        filedetails,
-        empty,
-    }
 
 
     public partial class TagBranch {
@@ -39,7 +18,7 @@ namespace Templification.Tags {
         }
 
 
-        // Copy one int nodeo another
+        // Copy one node into another
         public void copy(TagBranch other) {
             this.iter_idx        = 0;
             this.tag             = other.tag.clone();
@@ -52,10 +31,6 @@ namespace Templification.Tags {
             this.commands        = new List<BranchCommand>();
             this.children        = new List<TagBranch>();
 
-            //foreach (var key in other.slot_map.Keys) {
-            //    Console.WriteLine("KEY: " + key);
-            //    this.slot_map.Add(key, other.slot_map[key].clone());
-            //}
             foreach (var command in other.commands) {
                 this.commands.Add(command.clone());
             }

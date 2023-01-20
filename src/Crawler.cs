@@ -8,7 +8,7 @@ namespace Templification {
     // Used to pass information about the user supplied flags or defaults
     // to the program.
     // Examples would be:
-    // - Input Diretory for files to be processed
+    // - Input Directory for files to be processed
     // - Template Directory for files that are used during templification
     // - Output directory for CSS files
     // - Etc.
@@ -117,8 +117,20 @@ namespace Templification {
         public Dictionary<string,TemplateData> crawl_and_load_files(string input_dir, CmdLineOptions options) {
             var input_files = collect_files_by_ext(input_dir, "html");
             // LOAD TEMPLATE DATA
-            foreach(var keyPair in input_files) {
-                keyPair.Value.load_and_parse_file(options);
+            var file_keys = input_files.Keys.ToList();
+            foreach(var fileKey in file_keys) {
+                var file_templates = input_files[fileKey].load_and_parse_file(options);
+                foreach (var tree_key in file_templates.Keys) {
+                    var ttree = file_templates[tree_key];
+                    if (!input_files.ContainsKey(tree_key.ToLower())) {
+                        var tdata = new TemplateData() {
+                            name = tree_key,
+                            tag_tree = ttree,
+                        };
+                        tdata.apply_local_tags();
+                        input_files.Add(tree_key.ToLower(), tdata);
+                    }
+                }
             }
             return input_files;
         }
