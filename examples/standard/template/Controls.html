@@ -1,0 +1,38 @@
+<__Button>
+<style>
+ .btn {
+     padding: 10px;
+     border-radius: 20px;
+     border: none;
+     font-weight: bold;
+     cursor: pointer;
+ }
+ .btn-primary-1 {
+     background: #A7399A;
+ }
+ .btn-primary-2 {
+     background: #4499A5;
+     @global true;
+ }
+ .btn-neutral {
+     background: #a8a8a8;
+ }
+</style>
+
+{#if type = link}
+<a class="btn btn-primary-1">{default}</a>
+{:else}
+<input class="btn" type="button" value={default}/>
+{#endif}
+</__Button>
+
+<__Checkbox>
+<input id="{id}" type="checkbox" value="true" />
+<label for="{id}">{default}</label>
+</__Checkbox>
+
+<__Selection>
+<select class="px-2 px-1 bg-indigo-600 text-white border-none">
+    <slot name="option" />
+</select>
+</__Selection>

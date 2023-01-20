@@ -1,0 +1,76 @@
+<style>
+ @style-id: 333;
+ code {
+     @local true;
+     @apply bg-slate-200 mx-1 text-slate-600 text-sm px-1 py-2px;
+ }
+ .gray-item {
+     @apply mt-3 p-8 bg-nuetral-1 border-primary border-2 font-bold w-1/3;
+ }
+ .notes {
+     @apply text-sm text-gray-400 font-normal;
+ }
+</style>
+<div>
+    <div>
+        <h2 class="text-lg font-bold text-slate-500">Slots and Defaults</h2>
+        <p class="mb-2">Default slots are specificed with the <code class="ss333">&lt;slot/&gt;</code> tag inside a template.</p>
+        <p class="mb-2">Additionaly the <code class="ss333">&#123;default&#125</code>variable can be inserted into a template.
+            When it is present the first element or text from the source is inserted into this location in the template.</p>
+    </div>
+    <div class="flex gap-x-4">
+        <div class="mb-2 mt-4 border-1 border-slate-400 p-4 maxw-40%">
+            <p class="mb-2">The default value can also be set via an attribute like any other variable value.<br/>
+            e.g.<code class="ss333">&lt;TagName &#123;default&#125="value"...</code>
+            </p>
+            <p class="mb-2">To the right is the simplified layout of the template. The colored elements indicate where a child element is placed in the examples below</p>
+        </div>
+        <SimpleTemplate {leave}="javafunc();"
+                   class="gray-item">
+            &#123;default&#125;
+            <b>&lt;slot/&gt;</b><br/>
+            <b slot="li">&lt;slot name="li" /&gt;</b><br/>
+        </SimpleTemplate>
+    </div>
+    <div class="flex flex-row justify-center mt-4 mygap">
+        <SimpleTemplate {leave}="javafunc();"
+                   class="gray-item">
+            First Child
+            <b>Second child</b><br/>
+            <span class="notes">*First Child goes to &#123;default&#125; <br/>
+                Second child to default &lt;slot/&gt; since no slot specified.</span>
+        </SimpleTemplate>
+        <SimpleTemplate {leave}="javafunc();"
+                   class="gray-item"
+                   {default}="Default set via attribute variable">
+            First Child<br/>
+            <b>Second child</b><br/>
+            <span class="notes">*First Child and Second Child in &lt;slot/&gt;</span><br/>
+        </SimpleTemplate>
+        <SimpleTemplate {leave}="javafunc();" class="gray-item pl-10"
+                   {default}="">
+            First Child<br/>
+            <div>Second child</div>
+            <span class="notes"> *default set to blank text</span>
+        </SimpleTemplate>
+    </div>
+    <div class="mt-4 font-bold text-slate-500">Uses with list slot set</div>
+    <hr class="text-slate-500" />
+    <div class="flex flex-row justify-left mygap">
+        <SimpleTemplate {leave}="javafunc();" class="pl-10 gray-item">
+            First Child
+            <div>Second Child</div>
+            <li>First &lt;li&gt; Tag</li>
+            <li>Second &lt;li&gt; Tag</li>
+            <span class="notes"> *All &lt;li&gt; elements are put in the li slot regardless of where they are</span>
+        </SimpleTemplate>
+        <SimpleTemplate class="pl-10 gray-item">
+            <li>First &lt;li&gt; Tag</li>
+            <span>Second Child</span>
+            <div class="flex gap-4">
+                Third Child
+            </div>
+            <span class="notes"> *First Child is &lt;li&gt; but is put in slot not default. Currently Second child gets dropped, this is a bug :(</span>
+        </SimpleTemplate>
+    </div>
+</div>

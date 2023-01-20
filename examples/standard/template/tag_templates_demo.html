@@ -1,0 +1,77 @@
+<style>
+ .btn-primary-1 {
+     background: #aE5a04;
+     padding: 10px;
+     @global true;
+ }
+ .bordered {
+     border: 3px solid #444;
+ }
+ .btn {
+     padding: 10px;
+     border-radius: 20px;
+     color: white;
+     cursor: pointer;
+     text-decoration: underline;
+ }
+ .article {
+ }
+</style>
+<div class="flex flex-col gap-y-4">
+    <div>
+        <h2 class="text-lg font-bold text-slate-500">Tag Templates</h2>
+        <p>Tag Templates are templates wrapped in a tag with the 2 underscore template prefix, like: <code>&lt;__templateName...</code>.
+            After they are defined they are used like any other tag.
+        </p>
+        <p class="mt-2">
+            These templates&nbsp;<u>when they are on the root level of a file</u> can be used just like any other file based template.
+            If they are embedded within other tags they are &nbsp;<u>ONLY</u> available within that file.
+        </p>
+        <p class="mt-2">
+            Local/File Template Tags can have script tags, style tags, logic blocks and any other standard template definition.
+        </p>
+    </div>
+    <ExampleSection>
+        <div slot="code">
+            <div class="maxw-400px">
+                <h3>Root Level Tag Templates</h3>
+                &lt;__Button&gt;...&lt;/__Button&gt;<br/>
+                &lt;__TextBox&gt;...&lt;/__TextBox&gt;<br/>
+                &lt;__Select&gt;...&lt;/__Select&gt;
+                <div class="mt-4 text-gray-500 text-sm flex">
+                    *<span class="ml-2">This serves the case where many <br/>templates are embedded in a single file;
+                    for instance HTML controls like checkbox, select and textbox.
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div slot="example">
+            <Button class="btn-primary-1 text-white">From Tag Template</Button><br/>
+            <Checkbox {id}="mychk">From Tag Template</Checkbox><br/>
+            <Selection>
+                <option>First</option>
+                <option>Second</option>
+            </Selection>
+        </div>
+    </ExampleSection>
+    <ExampleSection>
+        <div slot="code">
+            <div class="maxw-400px">
+                <h3>Embedded Tag Templates</h3>
+                &lt;ATag&gt;
+                <p class="ml-4">
+                    &lt;__LocalTemplate&gt;<br/>...<br/>&lt;/__LocalTemplate&gt;<br/>
+                    &lt;LocalTemplate&gt;<br/>...<br/>&lt;/LocalTemplate&gt;
+                </p>
+                &lt;/ATag&gt;;
+                <div class="mt-4 text-gray-500 text-sm flex">
+                    *<span class="ml-2">First the tag is defined, then used.</span>
+                </div>
+            </div>
+        </div>
+        <div slot="example">
+            <__LocalTag>{default}</__LocalTag><br/>
+            <LocalTag>hello</LocalTag>
+        </div>
+    </ExampleSection>
+</div>
