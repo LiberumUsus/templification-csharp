@@ -59,6 +59,9 @@ namespace Templification.Templates {
             this.tag_tree.index_slots();
             this.tag_tree.root.parse_style_blocks(true);
             this.apply_local_tags();
+
+            // COLLECT SCRIPTS FOR BUNDLING
+            this.tag_tree.collect_scripts();
             // SET VARS INFO
             var tname = this.name;
 

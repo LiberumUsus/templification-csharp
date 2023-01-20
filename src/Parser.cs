@@ -49,6 +49,24 @@ namespace Templification {
 
             if (max_width <= 0) max_width = 40;
 
+            // WRITE TEMPLATE JAVASCRIPT TO FILES FIRST
+            // THIS PREVENTS DUPLICATE SCRIPTS FROM SHOWING UP
+            foreach (var tempFile in crawl_files.template_files.Values) {
+                var tag_tree = tempFile.tag_tree;
+                // Write collected javascript to bundle file
+                if (tag_tree.bundled_scripts.ContainsKey("_bundle_") && tag_tree.bundled_scripts["_bundle_"].Length > 0) {
+                    js_bundle_file.Write(Encoding.UTF8.GetBytes(tag_tree.bundled_scripts["_bundle_"].ToString()));
+                }
+                // WRITE JAVASCRIPT TO OTHER TARGETS. TODO: THIS IS PROBABLY CRAZY INEFFICIENT, NEEDS UPDATING
+                foreach(var key in tag_tree.bundled_scripts.Keys) {
+                    if (key != "_bundle_") {
+                        using (var destination = File.AppendText(js_parent_path + "/" + key + ".js")) {
+                            destination.WriteLine(tag_tree.bundled_scripts[key].ToString());
+                        }
+                    }
+                }
+            }
+
             // Loop over input files and insert templates
             foreach (var kp in crawl_files.input_files ) {
                 var fname       = kp.Key;
@@ -73,8 +91,6 @@ namespace Templification {
                 tag_tree.root.clear_vars(-1);
                 // Collect classes used in the tree
                 tag_tree.collect_classes();
-                // Collect scripts to bundle
-                tag_tree.collect_scripts(); //<═══ END SECTION;
 
                 // ════════════════════════════════════════════════════════════════════
                 // MERGE INT DATAO MASTER COLLECTIONS
