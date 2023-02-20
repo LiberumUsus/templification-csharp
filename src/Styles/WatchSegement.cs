@@ -11,7 +11,6 @@ namespace Templification.Styles {
 
 
         public bool consume(char chr, bool insensitive) {
-            //(self WatchSegment)
             if (this.value.Length == 0 ) {
                 return false;
             }

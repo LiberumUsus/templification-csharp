@@ -1,7 +1,8 @@
 using System.Data;
 using System.Text.RegularExpressions;
-using Templification.Styles;
 using static System.Net.Mime.MediaTypeNames;
+
+using Templification.Styles;
 using Templification.Utils;
 
 namespace Templification.Tags {
@@ -92,9 +93,10 @@ namespace Templification.Tags {
             }
 
             if (this.tag.tag_type != TagType.root ) {
-                foreach (var KeyPair in this.tag.attribs ) {
-                    var attr = KeyPair.Value;
-                    var name = KeyPair.Key;
+                var attribKeys = this.tag.attribs.Keys.ToList();
+                foreach (var key in attribKeys) {
+                    var attr = this.tag.attribs[key];
+                    var name = key;
                     if (attr.type == AttribType.variable ) {
                         if (!attr.value.ToLower().Contains("@html") ) {
                             this.tag.attribs.Remove(name);
@@ -111,6 +113,18 @@ namespace Templification.Tags {
                                 type = AttribType.standard,
                                 options = attr.options,
                             };
+                        }
+                    } else if (name.Contains("{") && depth < 0) {
+                        if (attr.value.Contains("=")) {
+                            var parts = attr.value.SplitNth("=", 1);
+                            this.tag.attribs.Remove(name);
+                            this.tag.attribs[parts[0]] = new Attribs {
+                                value = parts[1],
+                                type = AttribType.standard,
+                                options = attr.options,
+                            };
+                        } else {
+                            this.tag.attribs.Remove(name);
                         }
                     }
                 }
@@ -155,9 +169,12 @@ namespace Templification.Tags {
                 var attr = self_tag.attribs[name];
 
                 if (attr.type == AttribType.variable ) {
+                    // REPLACE SINGLE VARIABLE ATTRIBUTES <tag... {var} ... WITHOUT A VALUE
                     if (orig_attribs.ContainsKey(name) ) {
+
                         self_tag.attribs.Remove(name);
                         self_tag.attribs[orig_attribs[name].value] = orig_attribs[name];
+                        self_tag.attribs[orig_attribs[name].value].type = AttribType.standard;
                         self_tag.attribs[orig_attribs[name].value].value = self_tag.attribs[orig_attribs[name].value].value.Trim();
                     }
                 } else if (orig_var_attribs.Keys.Count > 0) {
@@ -202,7 +219,7 @@ namespace Templification.Tags {
                 var attr = orig_attribs[key];
                 if (attr.type == AttribType.variable ) {
                     if (!attr.value.ToLower().Contains("@html") ) {
-                        self_tag.tstr = self_tag.tstr.Replace(key, attr.value);
+                        self_tag.tstr = self_tag.tstr.Replace(attr.name, attr.value);
                     }
                 }
             }
@@ -291,11 +308,11 @@ namespace Templification.Tags {
 
         public int locate_default_attrib_merge_tag(int found_tags) {
             var local_count  =  found_tags;
-
             var i = 0;
+
             foreach (var child in this.children ) {
                 var start_count  =  local_count;
-                if (child.tag.internal_attribs.ContainsKey("__attr_default") ) {
+                if (child.tag.internal_attribs.ContainsKey(APP.DEFAULT_ATTR) ) {
                     local_count += 1;
                     break;
                 } else {
@@ -388,9 +405,9 @@ namespace Templification.Tags {
             var applied  =  false;
             var search_below  =  this.tag.tag_type == TagType.root || this.tag.tag_type == TagType.text || this.tag.no_merge_attribs;
 
-            if (search_below ) {
+            if (search_below) {
                 foreach (var child in this.children ) {
-                    if (child.tag.name.ToLower() == "style" || child.tag.name.ToLower() == "script" ) {
+                    if (child.tag.name.ToLower() == APP.SUB_TYPE_STYLE || child.tag.name.ToLower() == APP.SUB_TYPE_SCRIPT) {
                         continue;
                     }
                     applied = child.merge_attribs(attribs, this.tag.no_merge_attribs || only_if_default);
@@ -398,7 +415,7 @@ namespace Templification.Tags {
                         break;
                     }
                 }
-            } else if (only_if_default && this.tag.internal_attribs.ContainsKey("__attr_default") ) {
+            } else if (only_if_default && this.tag.internal_attribs.ContainsKey(APP.DEFAULT_ATTR) ) {
                 this.tag.merge_attribs(attribs, false);
                 applied = true;
             } else if (!only_if_default ) {
@@ -490,7 +507,7 @@ namespace Templification.Tags {
 
 
 
-        // INSERT INT CHILDRENO THE TAG NODE
+        // INSERT INTO CHILDREN THE TAG NODE
         // NOTE* NEED TO UPDATE FUNCTION TO USE THE INDEX PARAMETER AT SOME POINT
         public void insert_into(List<TagBranch> childs, string tag_name, Dictionary<string,Attribs> attribs , bool has_default, bool default_var_set) {
             // ERROR CHECKS
@@ -530,7 +547,7 @@ namespace Templification.Tags {
 
 
 
-        // INSERT INT CHILDRENO THE TAG NODE
+        // INSERT INTO CHILDREN THE TAG NODE
         // NOTE* NEED TO UPDATE FUNCTION TO USE THE INDEX PARAMETER AT SOME POINT
         public void insert_into_where(List<TagBranch> childs, string tag_name, Dictionary<string,Attribs> attribs ) {
             // ERROR CHECKS
@@ -593,7 +610,7 @@ namespace Templification.Tags {
 
             foreach (var child in childs ) {
                 i += 1;
-                if (child.tag.attribs[tag_name].options.Contains("s") ) {
+                if (child.tag.attribs[tag_name].options.Contains(APP.ATTRIB_SLOT_SUBSTITUTE) ) {
                     foreach (var inner_child in child.children ) {
                         parent.children.Insert(cindex, inner_child);
                         parent.children[cindex].tag.attribs.Remove(tag_name);

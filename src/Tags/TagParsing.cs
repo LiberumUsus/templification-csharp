@@ -26,6 +26,7 @@ namespace Templification.Tags {
                 // ------------------------------------------------------------
                 // LOCATE TAGS
                 var matchstr = source[special_groups[(i * 2)].start..special_groups[(i * 2) + 1].end];
+
                 sub_source   = source[findex..special_groups[(i * 2)].start];
                 if (sub_source != "\n" ) {
                     var mmatchs = any_ex.Matches(sub_source).ToList();
@@ -188,6 +189,9 @@ namespace Templification.Tags {
                     var attr  = keyPair.Value;
                     if (aname.StartsWith(APP.PREFIX_INTERNAL_ATTRIB) ) {
                         tag.internal_attribs[aname] = attr;
+                        if (aname == APP.ATTRIB_TEMPLATE) {
+                            tag.sub_type = TagSubType.template;
+                        }
                         tag.attribs.Remove(aname);
                     }
                 }
@@ -242,7 +246,8 @@ namespace Templification.Tags {
                 var options   =  "";
                 var attr_type =  AttribType.standard;
                 var parts     =  item.SplitNth("=", 1);
-                var key       =  parts[0].ToLower().Trim();
+                var attr_name =  parts[0].Trim();
+                var key       =  attr_name.ToLower();
 
                 value = (parts.Length > 1) ? parts[1] : "";
                 if (value.Length <= 0 ) {
@@ -250,11 +255,11 @@ namespace Templification.Tags {
                 } else {
                     value = value.TrimStart(new char[]{'\'','"'}).TrimEnd(new char[]{'\'','"'}).Trim();
                 }
-                var percent_index  = key.IndexOf("%");
+                var percent_index  = key.IndexOf(APP.ATTRIB_OPTION_FLAG);
                 if (key.StartsWith("@") ) {
                     attr_type = AttribType.command;
                 } else if (percent_index > -1 ) {
-                    var key_and_options  =  parts[0].SplitNth("%", 1);
+                    var key_and_options  =  parts[0].SplitNth(APP.ATTRIB_OPTION_FLAG, 1);
                     key = key_and_options[0].Trim();
                     options = key_and_options.Length > 1 ? key_and_options[1] : "";
                 } else if (key.StartsWith("{")) {
@@ -266,6 +271,7 @@ namespace Templification.Tags {
                     value = value,
                     options = options,
                     type = attr_type,
+                    name = attr_name
                 };
             }
 
@@ -350,6 +356,9 @@ namespace Templification.Tags {
                     new_tree.tree_name = template_name;
                     child.tag.name = "root";
                     child.tag.tag_type = TagType.root;
+                    child.tag.sub_type = TagSubType.empty;
+                    child.closing_tag.tag_type = TagType.root;
+                    child.closing_tag.sub_type = TagSubType.empty;
                     new_tree.init(child);
                     final_trees.Add(new_tree);
                     root.children.RemoveAt(i);
@@ -435,7 +444,12 @@ namespace Templification.Tags {
                         continue;
                     }
 
+                    // CONTINUE UNTIL END OF COMMENT
                     if (watch.name == "void" && comwatcher.is_searching() ) {
+                        continue;
+                    }
+                    // CONTINUE UNTIL END OF COMMENT
+                    if (vwatcher.is_searching() && watch.name != "void") {
                         continue;
                     }
 

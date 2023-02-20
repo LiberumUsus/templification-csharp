@@ -32,6 +32,7 @@ namespace Templification {
         public const string TEXT_NAME     = "text";
         public const string ROOT_NAME     = "root";
         public const string TEXT_NEWLINE  = "\n";
+        public const string DEFAULT_ATTR  = "__attr_default";
 
 
         public const string SUB_TYPE_SCRIPT      = "script";
@@ -46,9 +47,13 @@ namespace Templification {
         public const string PREFIX_INTERNAL_ATTRIB = "__";
 
 
-        public const string ATTRIB_FLAG_OVERRIDE = "o";
-        public const string ATTRIB_FLAG_DELETE   = "d";
-        public const string ATTRIB_FLAG_SUBST    = "t";
+        public const string ATTRIB_TEMPLATE       = "__template";
+        public const string ATTRIB_FLAG_OVERRIDE  = "o";
+        public const string ATTRIB_FLAG_IMPORTANT = "!";
+        public const string ATTRIB_FLAG_DELETE    = "d";
+        public const string ATTRIB_FLAG_SUBST     = "t";
+        public const string ATTRIB_SLOT_SUBSTITUTE = "s";
+        public const string ATTRIB_OPTION_FLAG     = "%";
 
     }
 

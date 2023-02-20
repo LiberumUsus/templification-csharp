@@ -21,6 +21,7 @@ namespace Templification.Tags {
         public TagBranch                          root        = new TagBranch();
         public StyleSheet                         styles      = new StyleSheet();
         public List<TagBranch>                    in_to_out   = new List<TagBranch>();
+        public Dictionary<string,TagTree> local_templates     = new Dictionary<string,TagTree>();
         public Dictionary<string,List<TagBranch>> tag_map     = new Dictionary<string,List<TagBranch>>();
         public Dictionary<string,List<TagBranch>> slot_map    = new Dictionary<string,List<TagBranch>>();
         public Dictionary<string,bool>            class_list  = new Dictionary<string,bool>();
@@ -67,8 +68,10 @@ namespace Templification.Tags {
                 styles      = this.styles.clone(),
                 tree_name   = this.tree_name,
                 type        = this.type,
-                fileDetails = this.fileDetails != null ? this.fileDetails.clone() : null
+                fileDetails = this.fileDetails != null ? this.fileDetails.clone() : null,
+                local_templates = new Dictionary<string, TagTree>()
             };
+
             new_tree.index_tags();
             new_tree.index_slots();
             return new_tree;
@@ -131,15 +134,13 @@ namespace Templification.Tags {
 
         // return true or false as to whether a tag key exists in the tag map
         public bool has_tag(string tag) {
-            //(self TagTree)
             return this.tag_map.ContainsKey(tag);
         }
 
 
 
-        // Index all of the tags in the root int treeo the map
+        // Index all of the tags in the root into the tree map
         public void index_tags() {
-            //(self TagTree)
             index_tag_tree(this.root, this.tag_map, this.in_to_out);
         }
 
@@ -148,14 +149,12 @@ namespace Templification.Tags {
         // Index all of the slot int attributeso the slot map
         // this is performed over the entire TagTree
         public void index_slots() {
-            //(self TagTree)
             index_slot_attribs(this.root, this.slot_map);
         }
 
 
 
         public void index_commands() {
-            //(self TagTree)
             this.root.index_tag_commands();
         }
 
@@ -163,7 +162,6 @@ namespace Templification.Tags {
 
         // Process commands that are in the attributes section of a node
         public void process_attrib_commands() {
-            //(self TagTree)
             this.root.process_attrib_commands();
         }
 
@@ -262,18 +260,55 @@ namespace Templification.Tags {
             var name            = "";
             var has_default_var = false;
             var tdata           = self.tag;
+            var removeList      = new List<TagBranch>();
             name                = tdata.name;
+
             Utils.Utils.ensure_map_has_entry(name, new List<TagBranch>(), mapping);
+
             if (name.Length > 0 ) {
                 mapping[name].Add(self);
             }
-            foreach (var tag in self.children) {
-                if (tag.has_default_var || tag.tag.tstr.Contains("{default}")) {
+
+            foreach (var child in self.children) {
+                if (child.has_default_var || child.tag.tstr.Contains("{default}")) {
                     self.has_default_var = true;
                     has_default_var = true;
                 }
-                has_default_var = index_tag_tree(tag, mapping, in_to_out) || has_default_var;
+
+                if (child.tag.sub_type == TagSubType.template) {
+                    var newTree       = new TagTree();
+                    var template_name = child.tag.name;
+                    // TEMPLATE IS IN A TEMPLATE TAG
+                    if (child.tag.internal_attribs.ContainsKey(APP.ATTRIB_TEMPLATE)) {
+                        template_name = child.tag.internal_attribs[APP.ATTRIB_TEMPLATE].value;
+                        var root = new TagBranch();
+                        root.tag.tag_type = TagType.root;
+                        root.closing_tag.tag_type = TagType.root;
+                        root.children.Add(child);
+                        newTree.init(root);
+                    } else if (child.tag.name.StartsWith(APP.PREFIX_TEMPLATE)) {
+                        template_name              = child.tag.name.Substring(2);
+                        child.tag.tag_type         = TagType.root;
+                        child.tag.sub_type         = TagSubType.empty;
+                        child.closing_tag.tag_type = child.tag.tag_type;
+                        child.closing_tag.sub_type = child.tag.sub_type;
+                        removeList.Add(child);
+                        newTree.init(child);
+                    }
+                    template_name = template_name.ToLower().Trim();
+                    if (!this.local_templates.ContainsKey(template_name)) {
+                        this.local_templates.Add(template_name, newTree);
+                    }
+                }
+
+                has_default_var = index_tag_tree(child, mapping, in_to_out) || has_default_var;
             }
+
+            // REMOVE TEMPLATES
+            foreach (var item in removeList) {
+                self.children.Remove(item);
+            }
+
             // MAP INNER TO OUTER TAGS
             in_to_out.Add(self);
             return has_default_var;

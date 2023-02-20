@@ -216,7 +216,15 @@ namespace Templification {
                 child_tag_name = tbranch.tag.name.ToLower();
 
                 if (tbranch.tag.tag_type != TagType.root ) {
-                    if (template_files.ContainsKey(child_tag_name)) {
+                    // PREFER LOCAL VS FILE
+                    if (tag_tree.local_templates.ContainsKey(child_tag_name)) {
+                        // COPY TEMPLATE TO BRANCH NODE
+                        var template_tree  =  tag_tree.local_templates[child_tag_name];
+                        parse_tree(template_tree, template_files);
+                        // ------------------------------------ START MERGE/USE OF TEMPLATE
+                        Templates.Templates.use_template_tree(template_tree, tbranch, tag_tree.styles);
+                        // ------------------------------------ END MERGE/USE OF TEMPLATE
+                    } else if (template_files.ContainsKey(child_tag_name)) {
                         // COPY TEMPLATE TO BRANCH NODE
                         var template_tree  =  template_files[child_tag_name].tag_tree;
                         parse_tree(template_tree, template_files);

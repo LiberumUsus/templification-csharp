@@ -32,6 +32,7 @@ namespace Templification.Tags {
 
         public string value    = "";
         public string options  = "";
+        public string name     = "";
         public AttribType type = new AttribType();
 
 
@@ -40,7 +41,8 @@ namespace Templification.Tags {
             var cloned = new Attribs() {
                 value   = this.value,
                 options = this.options,
-                type    = this.type
+                type    = this.type,
+                name    = this.name,
             };
 
             return cloned;

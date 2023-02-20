@@ -53,8 +53,13 @@ namespace Templification.Templates {
                 tag_tree.index_commands();
                 if (tag_tree.root.locate_default_attrib_merge_tag(0) > 0 ) {
                     tag_tree.root.tag.no_merge_attribs = true;
-                    if (tag_tree.root.children.Count > 0 ) {
-                        tag_tree.root.children[0].tag.no_merge_attribs = true;
+                    foreach (var child in tag_tree.root.children) {
+                        if (child.tag.name.ToLower() == APP.SUB_TYPE_STYLE ||
+                            child.tag.name.ToLower() == APP.SUB_TYPE_SCRIPT) {
+                            continue;
+                        }
+                        child.tag.no_merge_attribs = true;
+                        break;
                     }
                  }
                 tag_tree.index_tags();

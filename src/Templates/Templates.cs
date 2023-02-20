@@ -18,9 +18,14 @@ namespace Templification.Templates {
             // COPY ALTERED TEMPLATE
             usage.copy(ptemplate.root);
 
+            // Copy slot attrib over early for use in templification
+            if (orig_branch.tag.attribs.ContainsKey("slot")) {
+                usage.tag.attribs.Add("slot", orig_branch.tag.attribs["slot"].clone());
+            }
+
             // LOOP OVER ORIGINAL SLOT MAP AND INSERT SLOT INFO INTO CORRECT SLOTS
             foreach (var KeyPair in orig_branch.slot_map ) {
-                var key = KeyPair.Key;
+                var key        = KeyPair.Key;
                 var slot_array = KeyPair.Value;
                 var slot_attrib_filter  = new Dictionary<string, Attribs>() {
                     {"name", new Attribs {value = key}}
