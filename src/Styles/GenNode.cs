@@ -29,10 +29,12 @@ namespace Templification.Styles {
 
     public class GenNode {
 
-        public List<Rule> find_rules(string cls_part, StyleGenerator gen_list, bool is_negative) {
-            //(self GenNode)
+        public List<Rule> find_rules(string cls_part, StyleGenerator gen_list, bool is_negative, string defaultUnit = "px") {
             var rules   =  new List<Rule>();
             var current =  cls_part.AllBefore("-");
+
+            if (defaultUnit == "_") defaultUnit = "";
+
             if (this is PatNode ) {
                 var pnode  =  this as PatNode;
                 if (pnode == null) return rules;
@@ -51,9 +53,12 @@ namespace Templification.Styles {
                     }
                     // LOGIC REPLACEMENT
                 } else if (pnode.value == "%" ) {
-                    gen_list.current_key = gen_list.num_based[current];
+                    var nparts  = gen_list.num_based[current].Split(':');
+                    var useUnit = "px";
+                    gen_list.current_key = nparts[0];
+                    if (nparts.Length > 1) useUnit = nparts[1];
                     foreach (var child in pnode.children ) {
-                        rules = child.find_rules(cls_part.AllAfter("-"), gen_list, is_negative);
+                        rules = child.find_rules(cls_part.AllAfter("-"), gen_list, is_negative, useUnit);
                         if (rules.Count > 0 ) {
                             break;
                         }
@@ -138,8 +143,11 @@ namespace Templification.Styles {
                         if (is_negative ) {
                             vvalue = "-" + vvalue;
                         }
-                        var vunit  =  StyleGenerator.parse_unit(matches.Groups["unit"].Value);
-                        if (!snode.autounit ) {
+
+                        var vunit = (matches.Groups["unit"].Value.Length > 0) ? matches.Groups["unit"].Value : defaultUnit;
+                        vunit     = StyleGenerator.parse_unit(vunit);
+
+                        if (!snode.autounit || snode.pname == "z") {
                             vunit = "";
                         }
                         // CONSIDER MAKING GENERIC WITH PNAME
@@ -153,8 +161,25 @@ namespace Templification.Styles {
                             vunit = "";
                         }
 
+                        if (snode.value[0].Contains("operation")) {
+                            var orules = snode.rules.clone();
 
-                        if (vvalue.Length > 0 ) {
+                            for (var i = 0; i < orules.Count; i++) {
+                                var key = orules[i].key.Replace("{base}", gen_list.current_key);
+                                var rvalue = orules[i].rvalue;
+                                foreach (var grpName in trex.GetGroupNames()) {
+                                    var nvalue = matches.Groups[grpName].Value;
+                                    var varId  = "{" + grpName + "}";
+                                    key    = key.Replace(varId, nvalue);
+                                    rvalue = rvalue.Replace(varId, nvalue);
+                                }
+                                orules[i].key    = key;
+                                orules[i].rvalue = rvalue;
+                            }
+
+                            return orules;
+
+                        } else if (vvalue.Length > 0 ) {
                             var trules  =  new List<Rule>();
                             if (vdirs.Count > 0 ) {
                                 foreach (var direction in vdirs ) {

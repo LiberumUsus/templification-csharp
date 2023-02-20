@@ -80,6 +80,7 @@ namespace Templification.Tags {
         public string to_string(string key) {
             if (!active) return "";
             if (_key == "") _key = key;
+            if (_key == "class") _value = _value.Replace("%", "per");
             if (type != AttribType.command && _key.Length > 0) {
                 return " " + _key + (_key.Length > 0 ? "=\"" + _value + "\"" : "");
             } else {

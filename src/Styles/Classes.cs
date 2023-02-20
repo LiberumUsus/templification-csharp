@@ -37,7 +37,7 @@ namespace Templification.Styles {
             };
         }
 
-        public string str(Dictionary<string,int> class_map ) {
+        public string str() {
             //(self CClass)
             var out_build  =  new StringBuilder(100);
             var Index = 0;

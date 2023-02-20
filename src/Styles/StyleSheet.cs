@@ -182,9 +182,9 @@ namespace Templification.Styles {
                     if (!hold_levels.ContainsKey(cclass.importance) ) {
                         hold_levels[cclass.importance] = new StringBuilder(200);
                     }
-                    hold_levels[cclass.importance].Append(cclass.str(this.class_map));
+                    hold_levels[cclass.importance].Append(cclass.str());
                 } else {
-                    out_build.Append(cclass.str(this.class_map));
+                    out_build.Append(cclass.str());
                 }
             }
             var hkeys = hold_levels.Keys.ToList();

@@ -68,6 +68,7 @@ namespace Templification.Styles {
             {"l" , "left"},
             {"r" , "right"},
             {"b" , "bottom"},
+            {"z" , "z-index:_"},
             {"underline" , "text-underline-offset"},
             {"maxw" , "max-width"},
             {"minw" , "min-width"},
@@ -182,24 +183,24 @@ namespace Templification.Styles {
                             pname = "color",
                             rules = new List<Rule>{new Rule{
                                 key = "border-{dir}-color",
-                                    rvalue = "{value}"
+                                rvalue = "{value}"
                                 }}
                         },
                     new SubstNode{
                         value = new List<string>{@"^(?<dir>[tlrbxy]+)-(?<value>\d+)(?<unit>\S*)?"},
                         rules = new List<Rule>{new Rule{
                                 key = "border-{dir}-width",
-                                    rvalue = "{value}"
+                                rvalue = "{value}{unit}"
                                 }, new Rule{
                                 key = "border-{dir}-style",
-                                    rvalue = "solid",
+                                rvalue = "solid",
                             }}
                         },
                     new SubstNode{
                         value = new List<string>{@"^(?<value>\d+)(?<unit>\S+)?"},
                         rules = new List<Rule>{new Rule{
                                 key = "border-width",
-                                    rvalue = "{value}"
+                                rvalue = "{value}{unit}"
                                 }, new Rule{
                                 key = "border-style",
                                 rvalue = "solid",
@@ -228,6 +229,13 @@ namespace Templification.Styles {
                                 rvalue = "{value}"
                             }}
                         },
+                    new SubstNode{
+                        value = new List<string>{@"^(?<value>\d+)(?<unit>\S+)(?<operation>[+/*-])(?<value2>\d+)(?<unit2>\S+)"},
+                        rules = new List<Rule>{new Rule{
+                                key = "{base}",
+                                rvalue = "calc({value}{unit} {operation} {value2}{unit2})"
+                            }}
+                    },
                     new SubstNode{
                         value = new List<string>{@"^(?<value>\d+)(?<unit>\S+)?"},
                         rules = new List<Rule>{new Rule{
@@ -316,14 +324,12 @@ namespace Templification.Styles {
                 if (gen_list.num_based.ContainsKey(first_name) ) {
                     first_name = "num_based";
                 }
-                // IF BASECLASS ENDS IN %, THEN % IS THE UNIT AND IT DOES NOT WORK IN CSS
-                // CHANGE IT TO "per" WHICH IS HANDLED IN THIS CODE
-                if (baseclass.EndsWith("%")) baseclass = baseclass.Substring(0,baseclass.Length-1) + "per";
 
                 var node  = gnodes.ContainsKey(first_name) ? gnodes[first_name] : new GenNode();
                 var rules = node.find_rules(baseclass, gen_list, is_negative);
 
                 if (rules.Count > 0 ) {
+                    if (cls.Contains("%")) cls = cls.Replace("%","per");
                     out_class = new CClass {
                         names = new List<string>{"." + cls},
                         rules = rules,
@@ -331,15 +337,14 @@ namespace Templification.Styles {
                     master.classes.Add(out_class);
                 }
             }
+
             return out_class;
         }
 
         public static string parse_unit(string unit) {
             var new_unit  =  unit;
             var gen_list  = new StyleGenerator();
-            if (unit.Length == 0 ) {
-                new_unit = "px";
-            } else if (gen_list.units.ContainsKey(unit) ) {
+            if (gen_list.units.ContainsKey(unit)) {
                 new_unit = gen_list.units[unit];
             }
             return new_unit;
