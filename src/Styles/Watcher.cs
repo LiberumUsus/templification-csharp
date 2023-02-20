@@ -28,6 +28,7 @@ namespace Templification.Styles {
         public bool insensitive  {get; set;} = false;
         public bool reporting    {get; set;} = false;
         public bool debug        {get; set;} = false;
+        public bool escapeFound  {get; set;} = false;
 
         public Watcher(){}
 
@@ -91,7 +92,7 @@ namespace Templification.Styles {
             var record_index = -1;
             var matched_to   = WatchStage.zero;
 
-            if (this.begin_chr.consume(chr, this.insensitive) ) {
+            if (this.begin_chr.consume(chr, this.insensitive) && !escapeFound) {
                 record_index = index + this.begin_chr.offset;
 
                 if (this.begin_chr.indexouter ) {
@@ -99,12 +100,18 @@ namespace Templification.Styles {
                 }
                 matched_to = WatchStage.first;
                 this.end_chr.index = 0;
-            } else if (this.end_chr.consume(chr, this.insensitive) ) {
+            } else if (this.end_chr.consume(chr, this.insensitive) && !escapeFound ) {
                 record_index = index + this.end_chr.offset;
                 if (!this.begin_chr.indexouter ) {
                     record_index -= this.begin_chr.chrmatched;
                 }
                 matched_to = WatchStage.second;
+            } else {
+                escapeFound = false;
+            }
+
+            if (this.escape.consume(chr, this.insensitive)) {
+                escapeFound = true;
             }
 
             switch(matched_to) {

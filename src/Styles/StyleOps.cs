@@ -50,6 +50,11 @@ namespace Templification.Styles {
                                 rwatcher.suspend(true, i - 1);
                             }
                         }
+                        if (watch.name == "rule" && mpoint.d < mpoint.b) {
+                            if (bwatcher.is_searching()) {
+                                bwatcher.suspend(true, i -1);
+                            }
+                        }
                         if (watch.name == "block" && mpoint.d <= 0 ) {
                             rwatcher.active = true;
                             rwatcher.set_start(i + 1, WatchStage.first_confirm);
@@ -65,6 +70,9 @@ namespace Templification.Styles {
                                 bwatcher.suspend(false, i + 1);
                                 nwatcher.suspend(false, i + 1);
                                 rwatcher.suspend(false, i + 1);
+                            }
+                            if (watch.name == "rule") {
+                                bwatcher.suspend(false, i + 1);
                             }
 
                             // CLASS && RULE CREATING
