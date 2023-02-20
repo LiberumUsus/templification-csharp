@@ -98,28 +98,30 @@ namespace Templification.Tags {
                     var attr = this.tag.attribs[key];
                     var name = key;
                     if (attr.type == AttribType.variable ) {
-                        if (!attr.value.ToLower().Contains("@html") ) {
+                        if (!attr.Value.ToLower().Contains("@html") ) {
                             this.tag.attribs.Remove(name);
                         }
-                    } else if (attr.value.Contains("{") && depth < 0) {
-                        if (!attr.value.ToLower().Contains("@html") ) {
-                            var new_value  = Utils.Utils.clear_between(attr.value, "{", "}");
+                    } else if (attr.Value.Contains("{") && depth < 0) {
+                        if (!attr.Value.ToLower().Contains("@html") ) {
+                            var new_value  = Utils.Utils.clear_between(attr.Value, "{", "}");
                             // CLEAN UP TRAILING OR CONDITIONS... SUPER HACKY.. PROBABLY NEED TO REWRITE
                             // AAAALL OF THE VAR/CLASS REPLACMENT FUNCTIONS :(
                             if (new_value.Contains("| ")) new_value = new_value.Replace("| ", " ");
                             if (new_value.EndsWith("|")) new_value = new_value.Substring(0,new_value.Length-1);
                             this.tag.attribs[name] = new Attribs {
-                                value = new_value,
-                                type = AttribType.standard,
+                                Value   = new_value,
+                                Name    = name,
+                                type    = AttribType.standard,
                                 options = attr.options,
                             };
                         }
                     } else if (name.Contains("{") && depth < 0) {
-                        if (attr.value.Contains("=")) {
-                            var parts = attr.value.SplitNth("=", 1);
+                        if (attr.Value.Contains("=")) {
+                            var parts = attr.Value.SplitNth("=", 1);
                             this.tag.attribs.Remove(name);
                             this.tag.attribs[parts[0]] = new Attribs {
-                                value = parts[1],
+                                Value = parts[1],
+                                Name  = parts[0],
                                 type = AttribType.standard,
                                 options = attr.options,
                             };
@@ -173,19 +175,19 @@ namespace Templification.Tags {
                     if (orig_attribs.ContainsKey(name) ) {
 
                         self_tag.attribs.Remove(name);
-                        self_tag.attribs[orig_attribs[name].value] = orig_attribs[name];
-                        self_tag.attribs[orig_attribs[name].value].type = AttribType.standard;
-                        self_tag.attribs[orig_attribs[name].value].value = self_tag.attribs[orig_attribs[name].value].value.Trim();
+                        self_tag.attribs[orig_attribs[name].Value] = orig_attribs[name];
+                        self_tag.attribs[orig_attribs[name].Value].type = AttribType.standard;
+                        self_tag.attribs[orig_attribs[name].Value].Value = self_tag.attribs[orig_attribs[name].Value].Value.Trim();
                     }
                 } else if (orig_var_attribs.Keys.Count > 0) {
                     // DOES ATTRIBUTE CONTAIN A VARIABLE
-                    if (attr.value.Contains("{")) {
-                        attr.value = replace_var(attr.value, orig_var_attribs);
+                    if (attr.Value.Contains("{")) {
+                        attr.Value = replace_var(attr.Value, orig_var_attribs);
                     }
                 }
-                if (Regex.Match(attr.value, @"[{]\s*default\s*[}]").Success) {
+                if (Regex.Match(attr.Value, @"[{]\s*default\s*[}]").Success) {
                     if (orig_node.children.Count > 0 && orig_node.children[0].tag.tag_type == TagType.text ) {
-                        attr.value = orig_node.children[0].tag.tstr.Trim();
+                        attr.Value = orig_node.children[0].tag.tstr.Trim();
                     }
                 }
 
@@ -228,7 +230,7 @@ namespace Templification.Tags {
                     varKey = addBrackets ? "{" + varKey + "}" : varKey;
 
                     if (valueSource.ContainsKey(varKey)) {
-                        outValue = outValue.Replace(match.Value, valueSource[varKey].value);
+                        outValue = outValue.Replace(match.Value, valueSource[varKey].Value);
                         notReplaced = false;
                         break; // Only one replacement per variable set
                     }
@@ -247,7 +249,7 @@ namespace Templification.Tags {
                                 var tattribs  =  tparent.tag.attribs;
                                 var vattrname  =  part[1..];
                                 if (tattribs.ContainsKey(vattrname) ) {
-                                    outValue = outValue.Replace(match.Value, tattribs[vattrname].value);
+                                    outValue = outValue.Replace(match.Value, tattribs[vattrname].Value);
                                     notReplaced = false;
                                     break;
                                 }
@@ -283,7 +285,7 @@ namespace Templification.Tags {
 
                     foreach (var vars in varslist ) {
                         if (orig_attribs.ContainsKey("{" + vars + "}")) {
-                            self_tag.tstr = self_tag.tstr.Replace(vmatch_str, orig_attribs[("{" + vars + "}")].value);
+                            self_tag.tstr = self_tag.tstr.Replace(vmatch_str, orig_attribs[("{" + vars + "}")].Value);
                             value_set = true;
                             break;
                         }
@@ -300,7 +302,7 @@ namespace Templification.Tags {
                                     var tattribs  =  tparent.tag.attribs;
                                     var vattrname  =  vars[1..];
                                     if (tattribs.ContainsKey(vattrname) ) {
-                                        self_tag.tstr = self_tag.tstr.Replace(vmatch_str, tattribs[vattrname].value);
+                                        self_tag.tstr = self_tag.tstr.Replace(vmatch_str, tattribs[vattrname].Value);
                                         break;
                                     }
                                 }
@@ -369,7 +371,7 @@ namespace Templification.Tags {
         void make_class_replacement(StyleSheet style_sheet) {
             if (!this.tag.attribs.ContainsKey("class")) return;
             var class_attrib = this.tag.attribs["class"];
-            var top_classes  = class_attrib.value.Split(" ");
+            var top_classes  = class_attrib.Value.Split(" ");
 
             var index  = 0;
             foreach (var tclass in top_classes ) {
@@ -392,7 +394,7 @@ namespace Templification.Tags {
 
             var updated_classes  = string.Join(' ', top_classes).Trim();
             if (this.tag.attribs.ContainsKey("class") && updated_classes.Length > 0 ) {
-                this.tag.attribs["class"].value = updated_classes;
+                this.tag.attribs["class"].Value = updated_classes;
             }
         }
 
@@ -401,22 +403,23 @@ namespace Templification.Tags {
         // Add the matching class id to any element that has a local command in the style sheet
         void make_class_insert_by_tag(StyleSheet style_sheet) {
             var class_attrib = this.tag.attribs.ContainsKey("class") ? this.tag.attribs["class"] : new Attribs(); // Attribs  new or();
-            var top_classes  =  class_attrib.value.Split(" ");
+            var top_classes  =  class_attrib.Value.Split(" ");
             if (style_sheet.has_class(this.tag.name) ) {
                 var cclass  =  style_sheet.get_class(this.tag.name, true);
                 if (cclass.local && cclass.id > 0 ) {
                     var class_id  =  "ss" + cclass.id.ToString();
                     if (top_classes[0].Length <= 0 ) {
                         this.tag.attribs["class"] = new Attribs {
-                            value = class_id,
-                            type = AttribType.standard
+                            Value = class_id,
+                            Name  = "class",
+                            type  = AttribType.standard
                         };
                     } else {
                         // NEW CLASS CREATION AND MERGING
                         var new_class  =  cclass.clone();
                         new_class.names = new List<string>{"." + this.tag.name + "-sm"};
                         top_classes.Prepend(new_class.names[0][1..] + "-ss" + cclass.id.ToString());
-                        this.tag.attribs["class"].value = string.Join(" ", top_classes);
+                        this.tag.attribs["class"].Value = string.Join(" ", top_classes);
                         style_sheet.insert_class(new_class, cclass.sheet_index);
                     }
                 }
@@ -502,8 +505,8 @@ namespace Templification.Tags {
 
             for (var i = 0; i < this.children.Count; i++) {
                 var tag_info  =  this.children[i].tag;
-                var tag_attr_name = tag_info.attribs.ContainsKey("name") ? tag_info.attribs["name"].value.ToLower() : "";
-                if (tag_info.name.ToLower() == "slot" && tag_attr_name.Length > 0 ) {
+                var tag_attr_name = tag_info.attribs.ContainsKey("name") ? tag_info.attribs["name"].Value.ToLower() : "";
+                if (tag_info.name.ToLower() == APP.ATTRIB_SLOT_NAME && tag_attr_name.Length > 0 ) {
                     var copied_first  =  false;
                     var insert_index  =  1;
                     foreach (var child in childs ) {
@@ -677,8 +680,8 @@ namespace Templification.Tags {
         public Dictionary<string,bool> get_purge_slots() {
             var purge_slots  =  new Dictionary<string,bool>();
             foreach (var child in this.children ) {
-                if (child.tag.name == "slot" ) {
-                    var sname  =  child.tag.attribs["name"].value;
+                if (child.tag.name == APP.ATTRIB_SLOT_NAME ) {
+                    var sname  =  child.tag.attribs["name"].Value;
                     if (child.children.Count <= 0 && sname.Length > 0 ) {
                         purge_slots[sname] = true;
                     }
@@ -702,10 +705,10 @@ namespace Templification.Tags {
             var purge_slots  =  new Dictionary<string,bool>();
             for (var i = 0; i < this.children.Count; i++) {
                 var ctag  =  this.children[i].tag;
-                if (ctag.name == "slot" ) {
+                if (ctag.name == APP.ATTRIB_SLOT_NAME ) {
                     remove_list.Add(i);
                     if (ctag.attribs.ContainsKey("name") && this.children[i].children.Count <= 0 ) {
-                        purge_slots[ctag.attribs["name"].value] = true;
+                        purge_slots[ctag.attribs["name"].Value] = true;
                     }
                 }
             }
@@ -747,9 +750,9 @@ namespace Templification.Tags {
             var purge_slots  =  new Dictionary<string,bool>();
             for (var i = 0; i < this.children.Count; i++ ) {
                 var ctag  =  this.children[i].tag;
-                if (ctag.name == "slot" ) {
+                if (ctag.name == APP.ATTRIB_SLOT_NAME ) {
                     if (ctag.attribs.ContainsKey("name") && this.children[i].children.Count <= 0 ) {
-                        purge_slots[ctag.attribs["name"].value] = true;
+                        purge_slots[ctag.attribs["name"].Value] = true;
                     }
                 }
             }
@@ -772,8 +775,8 @@ namespace Templification.Tags {
             // FIND ALL TAGS WITH A DEPENDS ATTRIBUTE
             for (var i = 0; i < this.children.Count; i++) {
                 var ctag = this.children[i].tag;
-                if (ctag.attribs.ContainsKey("depends") && ctag.attribs["depends"].value.Length > 0 ) {
-                    depends_list[ctag.attribs["depends"].value] = i;
+                if (ctag.attribs.ContainsKey("depends") && ctag.attribs["depends"].Value.Length > 0 ) {
+                    depends_list[ctag.attribs["depends"].Value] = i;
                 }
             }
 
@@ -791,7 +794,7 @@ namespace Templification.Tags {
             // REMOVE ALL TAGS THAT DEPENDED ON A NON PROVIDED SLOT
             foreach (var i in remove_list ) {
                 var ctag   = this.children[i].tag;
-                var dvalue = ctag.attribs.ContainsKey("depends") ? ctag.attribs["depends"].value : "";
+                var dvalue = ctag.attribs.ContainsKey("depends") ? ctag.attribs["depends"].Value : "";
                 if (dvalue.Length > 0 && purge_slots.ContainsKey(dvalue) && purge_slots[dvalue]) {
                     this.children.RemoveAt(i);
                 }

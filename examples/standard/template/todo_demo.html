@@ -9,10 +9,10 @@
         @strict-delim
         @separator="|"
         @tag ="li">
-        Add local file templates (i.e. templates only applied in the file they reside in)|
+        <strike>Add local file templates (i.e. templates only applied in the file they reside in)</strike>|
         Add !important option to classes ( !w-20 or !border-1  etc ) |
-        Allow placing template directly into slot (e.g. &lt;Paper slot="content"...)|
-        Fix issue with variable replacement and builtin variable values (e.g. Paper template date)|
+        <strike>Allow placing template directly into slot (e.g. &lt;Paper slot="content"...)</strike>|
+        <strike>Fix issue with variable replacement and builtin variable values (e.g. Paper template date)</strike>|
         Fix issue where variables are applied into nested templates.|
         Fix issue where slots do not match with tag names when slot name provided |
         Fix @local true styling where previous definitions override later local ones.
@@ -21,7 +21,7 @@
   <Header type="h1" class="mt-4">Features In Progress</Header>
     <ul class="list-square ml-4" @strict-delim @separator="|" @tag="li">
         Option to bundle CSS into separate files |
-        Bubble up slots to first template level|
+        <span><strike>Bubble up slots to first template level</strike> &lt;--- appears to be finished</span> |
         <span class="title">Logic Blocks</span><ul class="list-circle ml-4" @separator="\n" @tag="li">IF / ELSEIF / ENDIF
             Match
             Repeat
@@ -30,7 +30,7 @@
     </ul>
     <Header type="h1" class="text-orange-800 mt-4">Documentation Missing</Header>
     <ul class="list-square ml-4" @strict-delim @separator="|" @tag="li">
-        Slot documentation | Variable Documentation | Logic Blocks
+        <strike>Slot documentation</strike> | Variable Documentation | Logic Blocks
     </ul>
     <Header type="h1" class="text-purple-800 mt-4">Code Improvements</Header>
     <ul class="list-square ml-4" @strict-delim @separator="|" @tag="li">

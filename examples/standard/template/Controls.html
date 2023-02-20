@@ -27,8 +27,9 @@
 </__Button>
 
 <__Checkbox>
-<input id="{id}" type="checkbox" value="true" />
-<label for="{id}">{default}</label>
+<label for="{id}">{default}
+    <input __attr_default id="{id}" type="checkbox" value="true" />
+</label>
 </__Checkbox>
 
 <__Selection>
@@ -36,3 +37,62 @@
     <slot name="option" />
 </select>
 </__Selection>
+
+
+<__Switch>
+<style>
+ @style-id: 101;
+ .switchslider {
+     @apply absolute w-50% h-100% bg-primary-2 rounded-50% border-1 border-slate-700;
+     @apply r-50%;
+     -webkit-transition: .2s;
+     transition: .2s;
+ }
+ .switchContainer {
+     @apply relative border-1 border-slate-700 flex justify-right;
+     border-top-left-radius: 25% 50%;
+     border-top-right-radius: 25% 50%;
+     border-bottom-right-radius: 25% 50%;
+     border-bottom-left-radius: 25% 50%;
+ }
+ .switchInner {
+     @apply inline-block bg-primary h-98%;
+	   border: 2px solid \{white\};
+ }
+ .switchLeft {
+     @apply rounded-tlbl-50% border-r-0;
+	   padding-right: calc(50% - 2px);
+ }
+ .switchRight {
+     @apply rounded-trbr-50% border-l-0;
+	   padding-left: calc(50% - 2px);
+ }
+ input:checked + .switchContainer .switchslider {
+     @apply r-0 bg-slate-300;
+     -webkit-transition: .2s;
+     transition: .2s;
+ }
+ input:checked + .switchContainer .switchInner {
+     @apply bg-slate-300;
+ }
+ .switchBar {
+     @apply absolute w-100% bg-primary-2;
+     height: 90%;
+     top: 5%;
+ }
+ .defaultSize {
+     @apply w-40px h-20px;
+ }
+
+</style>
+
+<label for="sw1|{id}" class="relative">{default}
+    <input id="sw1|{id}" class="hidden" type="checkbox" value="true" />
+    <div __attr_default class="switchContainer defaultSize {classbox}">
+        <span class="switchslider {switchClass}"></span>
+        <span class="switchLeft  switchInner {bgClass}"></span>
+        <span class="switchRight switchInner {bgClass}"></span>
+    </div>
+</label>
+
+</__Switch>

@@ -53,6 +53,7 @@ namespace Templification {
         public const string ATTRIB_FLAG_DELETE    = "d";
         public const string ATTRIB_FLAG_SUBST     = "t";
         public const string ATTRIB_SLOT_SUBSTITUTE = "s";
+        public const string ATTRIB_SLOT_NAME       = "slot";
         public const string ATTRIB_OPTION_FLAG     = "%";
 
     }

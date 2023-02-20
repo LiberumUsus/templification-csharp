@@ -1,3 +1,14 @@
+# CSS RULE FILE
+# This file can contain any pattern that the user desires and is
+# in no way limited to the contents within. These rules will
+# override generated rules in the application.
+#
+# History:
+# These styles are mostly derived from https://tailwindcss.com
+# Tailwindcss is an absolutely EXCELLENT CSS framework
+# This project is in no way affiliated with Tailwindcss
+#
+
 absolute	position: absolute;
 align-baseline	vertical-align: baseline;
 align-bottom	vertical-align: bottom;
@@ -71,6 +82,9 @@ flex-row-reverse	flex-direction: row-reverse;
 flex-wrap	flex-wrap: wrap;
 flex-wrap-reverse	flex-wrap: wrap-reverse;
 flex-grow	flex-grow: 1
+flex-grow-2	flex-grow: 2
+flex-grow-3	flex-grow: 3
+flex-grow-4	flex-grow: 4
 float-left	float: left;
 float-none	float: none;
 float-right	float: right;
@@ -1825,6 +1839,7 @@ text-left	text-align: left;
 text-center	text-align: center;
 text-right	text-align: right;
 text-justify	text-align: justify;
+disable-select	-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;
 outline-none	outline: 2px solid transparent;outline-offset: 2px;
 outline	outline-style: solid;
 outline-dashed	outline-style: dashed;

@@ -92,7 +92,7 @@ namespace Templification.Tags {
         // COLLECT CLASSES FROM TAGS, THIS IS DIFFERENT THAN STYLE BLOCK COLLECTION
         public void collect_classes(Dictionary<string,bool> list ) {
             if (this.tag.attribs.ContainsKey("class")) {
-                var class_array  =  this.tag.attribs["class"].value.Split(" ");
+                var class_array  =  this.tag.attribs["class"].Value.Split(" ");
                 foreach (var item in class_array ) {
                     if (!list.ContainsKey(item) ) {
                         list[item] = true;
@@ -110,9 +110,9 @@ namespace Templification.Tags {
         public void collect_scripts(Dictionary<string, StringBuilder> collected) {
             var location = "_bundle_";
 
-            if (this.tag.sub_type == TagSubType.script && this.tag.attribs.ContainsKey("target") && this.tag.attribs["target"].value == "bundle" ) {
+            if (this.tag.sub_type == TagSubType.script && this.tag.attribs.ContainsKey("target") && this.tag.attribs["target"].Value == "bundle" ) {
                 if (this.tag.attribs.ContainsKey("location")) {
-                    var checkValue = this.tag.attribs["location"].value;
+                    var checkValue = this.tag.attribs["location"].Value;
                     if (Regex.Match(checkValue, @"[a-zA-Z0-9]+").Success) {
                         location = checkValue;
                     }
@@ -142,9 +142,9 @@ namespace Templification.Tags {
                 return out_string;
             } else if (tag_start.name.ToLower() == "!templification" ) {
                 return out_string;
-            } else if ( tag_start.attribs.ContainsKey("target") && tag_start.sub_type == TagSubType.script && tag_start.attribs["target"].value != "bundle" ) {
+            } else if ( tag_start.attribs.ContainsKey("target") && tag_start.sub_type == TagSubType.script && tag_start.attribs["target"].Value != "bundle" ) {
                 return tag_start.to_string(indent);
-            } else if ( tag_start.attribs.ContainsKey("target") && tag_start.sub_type == TagSubType.script && tag_start.attribs["target"].value == "bundle" ) {
+            } else if ( tag_start.attribs.ContainsKey("target") && tag_start.sub_type == TagSubType.script && tag_start.attribs["target"].Value == "bundle" ) {
                 return "";
             }
 
@@ -177,7 +177,7 @@ namespace Templification.Tags {
                 return new List<TextData>();
             }
 
-            if (tag_start.attribs.ContainsKey("data-search-skip") && tag_start.attribs["data-search-skip"].value.Length <= 0 ) {
+            if (tag_start.attribs.ContainsKey("data-search-skip") && tag_start.attribs["data-search-skip"].Value.Length <= 0 ) {
                 // ERROR CHECKS
                 if (tag_start.is_set() && tag_start.tag_type != TagType.root && tag_start.name.ToLower() != "void" ) {
                     var tdat  =  tag_start.get_text_data();
@@ -283,8 +283,8 @@ namespace Templification.Tags {
                 default: {
                     // ADD SLOT TAGS TO SLOT MAP (DEFAULT ACTION)
                     if (create_attrib) {
-                        if (!child.tag.attribs.ContainsKey("slot")) break;
-                        var child_slot = child.tag.attribs["slot"].value;
+                        if (!child.tag.attribs.ContainsKey(APP.ATTRIB_SLOT_NAME)) break;
+                        var child_slot = child.tag.attribs[APP.ATTRIB_SLOT_NAME].Value;
                         if (child_slot.Length > 0 ) {
                             if (!this.slot_map.ContainsKey(child_slot) ) {
                                 this.slot_map[child_slot] = new List<TagBranch>();
@@ -360,7 +360,7 @@ namespace Templification.Tags {
             }
             // ITERATE THROUGH CHILDREN, THAT ARE NOT SLOTS
             foreach (var child in this.children ) {
-                if (!child.tag.attribs.ContainsKey("slot")) {
+                if (!child.tag.attribs.ContainsKey(APP.ATTRIB_SLOT_NAME)) {
                     child.index_tag_commands();
                 }
             }

@@ -19,8 +19,8 @@ namespace Templification.Templates {
             usage.copy(ptemplate.root);
 
             // Copy slot attrib over early for use in templification
-            if (orig_branch.tag.attribs.ContainsKey("slot")) {
-                usage.tag.attribs.Add("slot", orig_branch.tag.attribs["slot"].clone());
+            if (orig_branch.tag.attribs.ContainsKey(APP.ATTRIB_SLOT_NAME)) {
+                usage.tag.attribs.Add(APP.ATTRIB_SLOT_NAME, orig_branch.tag.attribs[APP.ATTRIB_SLOT_NAME].clone());
             }
 
             // LOOP OVER ORIGINAL SLOT MAP AND INSERT SLOT INFO INTO CORRECT SLOTS
@@ -28,12 +28,12 @@ namespace Templification.Templates {
                 var key        = KeyPair.Key;
                 var slot_array = KeyPair.Value;
                 var slot_attrib_filter  = new Dictionary<string, Attribs>() {
-                    {"name", new Attribs {value = key}}
+                    {"name", new Attribs {Value = key}}
                 };
                 foreach (var item in slot_array ) {
                     skip_list[item.tag.get_id()] = item.tag.name;
                 }
-                usage.insert_into_where(slot_array, "slot", slot_attrib_filter);
+                usage.insert_into_where(slot_array, APP.ATTRIB_SLOT_NAME, slot_attrib_filter);
             } // END LOOP OVER SLOT MAP;
 
             // FILL CHILDREN SLOTS BASED ON TAG NAME
@@ -42,9 +42,9 @@ namespace Templification.Templates {
             var default_is_set  = orig_branch.tag.attribs.ContainsKey("{default}");
 
             // FILL REST OF CHILDREN INTO SLOT IF IT IS AVAILABLE
-            usage.insert_into(orig_branch.exclude_children_by_id(skip_list), "slot",
+            usage.insert_into(orig_branch.exclude_children_by_id(skip_list), APP.ATTRIB_SLOT_NAME,
                               new Dictionary<string, Attribs>(){
-                                  {"name", new Attribs{value = ""}}
+                                  {"name", new Attribs{Value = ""}}
                               },
                               usage.has_default(), default_is_set);
 
@@ -60,7 +60,7 @@ namespace Templification.Templates {
             usage.apply_internal_attrib_commands(true);
             // SPECIAL CASE FINAL ATTRIB COMMANDS
             if (orig_branch.tag.internal_attribs.ContainsKey("__wrapin")) {
-                var tagName  = orig_branch.tag.internal_attribs["__wrapin"].value;
+                var tagName  = orig_branch.tag.internal_attribs["__wrapin"].Value;
                 var tagNames = tagName.Split('.').ToList();
                 tagNames.Reverse();
                 foreach (var part in tagNames) {

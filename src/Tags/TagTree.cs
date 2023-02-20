@@ -199,7 +199,7 @@ namespace Templification.Tags {
             found_match = false;
             delete_parts = new List<int>();
             foreach (var child in tbranch.children ) {
-                if (!child.tag.attribs.ContainsKey("slot")) {
+                if (!child.tag.attribs.ContainsKey(APP.ATTRIB_SLOT_NAME)) {
                     foreach (var command in child.commands ) {
                         if (verify_command_value(command, usage) && !found_match ) {
                             found_match = true;
@@ -241,11 +241,11 @@ namespace Templification.Tags {
                     var key   = key_value[0].Trim();
                     var value = key_value[1].Trim();
                     if (usage.tag.attribs.ContainsKey(key) ) {
-                        if (usage.tag.attribs[key].value == value ) {
+                        if (usage.tag.attribs[key].Value == value ) {
                             matches_attrib = true;
                         }
                     }
-                } else if (usage.tag.attribs.ContainsKey(mod_attr) && usage.tag.attribs[mod_attr].value.Length > 0 ) {
+                } else if (usage.tag.attribs.ContainsKey(mod_attr) && usage.tag.attribs[mod_attr].Value.Length > 0 ) {
                     matches_attrib = true;
                 }
             }
@@ -280,7 +280,7 @@ namespace Templification.Tags {
                     var template_name = child.tag.name;
                     // TEMPLATE IS IN A TEMPLATE TAG
                     if (child.tag.internal_attribs.ContainsKey(APP.ATTRIB_TEMPLATE)) {
-                        template_name = child.tag.internal_attribs[APP.ATTRIB_TEMPLATE].value;
+                        template_name = child.tag.internal_attribs[APP.ATTRIB_TEMPLATE].Value;
                         var root = new TagBranch();
                         root.tag.tag_type = TagType.root;
                         root.closing_tag.tag_type = TagType.root;
@@ -320,8 +320,8 @@ namespace Templification.Tags {
         void index_slot_attribs(TagBranch self, Dictionary<string,List<TagBranch>> mapping ) {
             var value  =  "";
             var tdata  =  self.tag;
-            if (tdata.attribs.ContainsKey("slot") ) {
-                value = tdata.attribs["slot"].value;
+            if (tdata.attribs.ContainsKey(APP.ATTRIB_SLOT_NAME) ) {
+                value = tdata.attribs[APP.ATTRIB_SLOT_NAME].Value;
                 Utils.Utils.ensure_map_has_entry(value, new List<TagBranch>(), mapping);
             }
             if (value.Length > 0 ) {

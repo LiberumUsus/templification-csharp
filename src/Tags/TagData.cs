@@ -98,29 +98,33 @@ namespace Templification.Tags {
             };
 
             foreach (var KPair in attribs ) {
-                var key = KPair.Key;
+                var key    = KPair.Key;
                 var attrib = KPair.Value;
-                if ((!attrib.options.Contains("!") && only_important) ||
-                    (attrib.options.Contains("!") && !only_important) ) {
+                if ((!attrib.options.Contains(APP.ATTRIB_FLAG_IMPORTANT) && only_important) ||
+                    (attrib.options.Contains(APP.ATTRIB_FLAG_IMPORTANT) && !only_important) ) {
                     continue;
                 }
                 if (attrib.type != AttribType.variable ) {
                     // OVERRIDE ATTRIB COMPLETELY
-                    if (!this.attribs.ContainsKey(key) || attrib.options.Contains(APP.ATTRIB_FLAG_OVERRIDE) ) {
+                    if (!this.attribs.ContainsKey(key)) {
                         this.attribs[key] = attrib;
-                    // DELETE ATTRIB IN TARGET
-                    } else if (attrib.options.Contains(APP.ATTRIB_FLAG_DELETE) ) {
-                        this.attribs.Remove(key);
+                    } else if (attrib.options.Contains(APP.ATTRIB_FLAG_OVERRIDE)) {
+                        this.attribs[key].merge(attrib);
+                    } else if (this.attribs[key].options.Contains(APP.ATTRIB_FLAG_OVERRIDE)) {
+                        // DO NOTHING, LET THE ORIGINAL CLASS VALUES WIN
+                    } else if (this.attribs[key].options.Contains(APP.ATTRIB_FLAG_DELETE) ) {
+                        // DELETE ATTRIB IN TARGET
+                        this.attribs[key].active = false;
                     } else if (mergeable.ContainsKey(key) ) {
-                        var attrib_value  =  this.attribs[key].value;
+                        var attrib_value  =  this.attribs[key].Value;
                         // OVERRIDE EXISTING CLASSES THAT HAVE MATCHING PREFIXES
                         // E.G. class%t="border-2" ==> template: class="border-1"
                         // final result is: class="border-2" ... NOT: class="border-1 border-2"
-                        if (attrib.options.Contains("t") ) {
-                            var new_value  =  Utils.Utils.replace_class_with_prefix(this.attribs[key].value, attrib.value);
-                            this.attribs[key].value = new_value;
+                        if (attrib.options.Contains(APP.ATTRIB_FLAG_SUBST) ) {
+                            var new_value  =  Utils.Utils.replace_class_with_prefix(attrib_value, attrib.Value);
+                            this.attribs[key].Value = new_value;
                         } else {
-                            this.attribs[key].value = attrib_value.Trim() + " " + attrib.value;
+                            this.attribs[key].Value = attrib_value.Trim() + " " + attrib.Value;
                         }
                     }
                 } else {
@@ -200,19 +204,13 @@ namespace Templification.Tags {
                     sbuilder.Append("/");
                 }
                 sbuilder.Append(this.name);
+
                 foreach (var KeyPair in this.attribs ) {
                     var key    = KeyPair.Key;
                     var attrib = KeyPair.Value;
-                    if (key.Length <= 0 || attrib.type == AttribType.command ) {
-                        continue;
-                    }
-
-                    sbuilder.Append(" ");
-                    sbuilder.Append(key);
-                    if (key != attrib.value ) {
-                        sbuilder.Append("=\"" + attrib.value + "\"");
-                    }
+                    sbuilder.Append(attrib.to_string(key));
                 }
+
                 if (this.tag_type == TagType.single ) {
                     sbuilder.Append("/");
                 }

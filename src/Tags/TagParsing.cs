@@ -268,10 +268,10 @@ namespace Templification.Tags {
                 }
 
                 mapping[key] = new Attribs {
-                    value = value,
+                    Value = value,
+                    Name = attr_name,
                     options = options,
                     type = attr_type,
-                    name = attr_name
                 };
             }
 
@@ -390,8 +390,8 @@ namespace Templification.Tags {
                 var key = kp.Key;
                 var attrib = kp.Value;
                 if (local.ContainsKey(key) ) {
-                    all_contained = local[key].value == source[key].value;
-                } else if (attrib.value.Length == 0 ) {
+                    all_contained = local[key].Value == source[key].Value;
+                } else if (attrib.Value.Length == 0 ) {
                     // WHEN A KEY WITH NO VALUE IS GIVEN, INT THEENTION
                     // IS TO DETERMINE THAT THE KEY IS _NOT_ PRESENT
                     all_contained = true;

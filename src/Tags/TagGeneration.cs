@@ -30,7 +30,7 @@ namespace Templification.Tags {
 
         public void init(TagBranch branch) {
             //(self CreateTagData)
-            this.separator = branch.tag.attribs["@separator"].value;
+            this.separator = branch.tag.attribs["@separator"].Value;
             if (this.separator == "\\n" ) {
                 this.separator = "\n";
             }
@@ -42,10 +42,10 @@ namespace Templification.Tags {
         public void extract_attribs(TagBranch branch) {
             //(self CreateTagData)
             this.tag_type = (branch.tag.attribs.ContainsKey("@tag")) ? branch.tag.attribs["@tag"] : new Attribs();
-            if (this.tag_type.value.Length <= 0 ) {
+            if (this.tag_type.Value.Length <= 0 ) {
                 // DEFAULT ATTRIB IS "div"
                 this.tag_type = new Attribs {
-                    value = "div",
+                    Value = "div",
                     type = AttribType.command,
                 };
             }
@@ -57,9 +57,9 @@ namespace Templification.Tags {
                 var attrib = keyPair.Value;
                 if (key.StartsWith("@tag-") ) {
                     var akey  =  key.AllAfter("-");
-                    this.has_indexer = this.has_indexer || attrib.value.Contains("#");
+                    this.has_indexer = this.has_indexer || attrib.Value.Contains("#");
                     this.attrib_map[akey] = new Attribs {
-                        value = attrib.value,
+                        Value = attrib.Value,
                         type = AttribType.standard
                     };
                 }
@@ -211,21 +211,21 @@ namespace Templification.Tags {
                 foreach (var keyattrib in local_attribs ) {
                     var key = keyattrib.Key;
                     var attrib = keyattrib.Value;
-                    if (attrib.value.Contains("#") ) {
-                        local_attribs[key].value = attrib.value.Replace("#", cdata.index.ToString());
+                    if (attrib.Value.Contains("#") ) {
+                        local_attribs[key].Value = attrib.Value.Replace("#", cdata.index.ToString());
                     }
                 }
             }
 
             var return_tag  = new  TagBranch{
                 tag = new TagData {
-                    name = cdata.tag_type.value,
+                    name = cdata.tag_type.Value,
                     tag_type = TagType.start,
                     new_line = "\n",
                     attribs = local_attribs,
                 },
                 closing_tag = new TagData{
-                    name = cdata.tag_type.value,
+                    name = cdata.tag_type.Value,
                     tag_type = TagType.end,
                     new_line = "\n"
                 }
