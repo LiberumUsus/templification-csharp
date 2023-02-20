@@ -61,14 +61,14 @@ namespace Templification.Tags {
         public static List<TagData> create_tag_from_string(string source, TagGroup group) {
             var sub_source  =  source[group.start..group.end];
 
-            var pat_script_start =  @"(?<"+APP.TAG_SPACE+@">\s*)?<(?<"+APP.TAG_NAME+@">script)\s*(?<"+APP.TAG_ATTRIBS+@">.*)>";
-            var pat_script_end   =  @"(?<"+APP.TAG_SPACE+@">\s*)?</(?<"+APP.TAG_NAME+@">script)\s*>";
-            var pat_tag_start    =  @"(?<"+APP.TAG_SPACE+@">\s*)?<(?<"+APP.TAG_NAME+@">[a-zA-Z0-9_\-]+)\s*(?<"+APP.TAG_ATTRIBS+@">.*)>";
-            var pat_tag_end      =  @"(?<"+APP.TAG_SPACE+@">\s*)?</(?<"+APP.TAG_NAME+@">\w*)\s*>";
-            var pat_tag_single   =  @"(?<"+APP.TAG_SPACE+@">\s*)?<(?<"+APP.TAG_NAME+@">\w*)\s*(?<"+APP.TAG_ATTRIBS+@">[^>]*)/>";
-            var pat_command      =  @"^(?<space>\s*)?{[#:/](?<"+APP.TAG_NAME+@">\w*)\s*(?<"+APP.TAG_ATTRIBS+@">[^><]*)}";
-            var pat_details_start =  @"(?<"+APP.TAG_SPACE+@">\s*)?<(?<"+APP.TAG_NAME+@">"+APP.SUB_TYPE_FILEDETAILS.ToUpper()+@")\s*(?<"+APP.TAG_ATTRIBS+@">.*)>";
-            var pat_details_end   =  @"(?<"+APP.TAG_SPACE+@">\s*)?</(?<"+APP.TAG_NAME+@">"+APP.SUB_TYPE_FILEDETAILS.ToUpper()+@")\s*>";
+            var pat_script_start  = @"(?<"+APP.TAG_SPACE+@">\s*)?<(?<"+APP.TAG_NAME+@">script)\s*(?<"+APP.TAG_ATTRIBS+@">.*)>";
+            var pat_script_end    = @"(?<"+APP.TAG_SPACE+@">\s*)?</(?<"+APP.TAG_NAME+@">script)\s*>";
+            var pat_tag_start     = @"(?<"+APP.TAG_SPACE+@">\s*)?<(?<"+APP.TAG_NAME+@">[a-zA-Z0-9_\-]+)\s*(?<"+APP.TAG_ATTRIBS+@">.*)>";
+            var pat_tag_end       = @"(?<"+APP.TAG_SPACE+@">\s*)?</(?<"+APP.TAG_NAME+@">\w*)\s*>";
+            var pat_tag_single    = @"(?<"+APP.TAG_SPACE+@">\s*)?<(?<"+APP.TAG_NAME+@">\w*)\s*(?<"+APP.TAG_ATTRIBS+@">[^>]*)/>";
+            var pat_command       = @"^(?<space>\s*)?{[#:/](?<"+APP.TAG_NAME+@">\w*)\s*(?<"+APP.TAG_ATTRIBS+@">[^><]*)}";
+            var pat_details_start = @"(?<"+APP.TAG_SPACE+@">\s*)?<(?<"+APP.TAG_NAME+@">"+APP.SUB_TYPE_FILEDETAILS.ToUpper()+@")\s*(?<"+APP.TAG_ATTRIBS+@">.*)>";
+            var pat_details_end   = @"(?<"+APP.TAG_SPACE+@">\s*)?</(?<"+APP.TAG_NAME+@">"+APP.SUB_TYPE_FILEDETAILS.ToUpper()+@")\s*>";
 
             var end_ex           = new Regex(pat_tag_end,       RegexOptions.Singleline);
             var single_ex        = new Regex(pat_tag_single,    RegexOptions.Singleline);
@@ -193,15 +193,15 @@ namespace Templification.Tags {
                 }
 
                 tag.tag_type = mtype;
-                if (name.ToLower().Trim() == APP.SUB_TYPE_STYLE) {
+                if (name.ToLower().Trim() == APP.SUB_TYPE_STYLE.ToLower()) {
                     tag.sub_type = TagSubType.style;
-                } else if (name.ToLower().Trim() == APP.SUB_TYPE_SCRIPT) {
+                } else if (name.ToLower().Trim() == APP.SUB_TYPE_SCRIPT.ToLower()) {
                     tag.sub_type = TagSubType.script;
-                } else if (name.ToLower().Trim() == APP.SUB_TYPE_VOIDEX) {
+                } else if (name.ToLower().Trim() == APP.SUB_TYPE_VOIDEX.ToLower()) {
                     tag.sub_type = TagSubType.void_exact;
-                } else if (name.StartsWith(APP.PREFIX_TEMPLATE)) {
+                } else if (name.StartsWith(APP.PREFIX_TEMPLATE.ToLower())) {
                     tag.sub_type = TagSubType.template;
-                } else if (name.ToLower().Trim() == APP.SUB_TYPE_FILEDETAILS) {
+                } else if (name.ToLower().Trim() == APP.SUB_TYPE_FILEDETAILS.ToLower()) {
                     tag.sub_type = TagSubType.filedetails;
                 }
 
@@ -323,8 +323,8 @@ namespace Templification.Tags {
                                     current_node.tag.sub_type == TagSubType.filedetails) {
                                     current_node.tag.tstr = source[current_node.tag.outer.start..current_node.tag.outer.end];
                                 } else if (current_node.tag.sub_type == TagSubType.void_exact ) {
-                                    var vstart  =  current_node.tag.outer.start + 12;
-                                    var vend    =  current_node.tag.outer.end - 13;
+                                    var vstart  =  current_node.tag.outer.start + (APP.SUB_TYPE_VOIDEX.Length + 2);
+                                    var vend    =  current_node.tag.outer.end - (APP.SUB_TYPE_VOIDEX.Length + 3);
                                     current_node.tag.tstr = source[vstart..vend];
                                 }
 
@@ -396,28 +396,30 @@ namespace Templification.Tags {
 
         // Parse a CSS file or style block
         public static List<TagGroup> collect_preprocess_blocks(string source, CmdLineOptions options) {
-            var out_tags  =  new List<TagGroup>();
-
-            var cswatcher  = new Watcher(APP.SUB_TYPE_RAZOR, "@Html ) \\", true);
-            cswatcher.insensitive = true;
-            cswatcher.active      = options.preprocess_razor;
-
+            var out_tags     = new List<TagGroup>();
             var watchers     = new List<Watcher>();
             var watcherTypes = new Dictionary<string, TagSubType>();
 
-            watchers.Add(cswatcher);
+            watchers.Add(new Watcher(APP.SUB_TYPE_RAZOR, "@Html ) \\", true)
+                         .setActive(options.preprocess_razor)
+                         .setInsensitive(true));
             watcherTypes.Add(APP.SUB_TYPE_RAZOR, TagSubType.cshtml);
+
+
             var detailsWatchString = "<" + APP.SUB_TYPE_FILEDETAILS.ToUpper() + ">";
                 detailsWatchString += " </" + APP.SUB_TYPE_FILEDETAILS.ToUpper() + "> \\";
             watchers.Add(new Watcher("filedetails", detailsWatchString, true));
             watcherTypes.Add("filedetails", TagSubType.filedetails);
+
             watchers.Add(new Watcher(APP.SUB_TYPE_SCRIPT, "<script*> </script> \\", true).offsets(1, 0));
             watcherTypes.Add(APP.SUB_TYPE_SCRIPT, TagSubType.script);
-            var voidExWatchString = "<" + APP.SUB_TYPE_VOIDEX.ToUpper() + ">";
-                voidExWatchString += " </" + APP.SUB_TYPE_VOIDEX.ToUpper() + "> \\";
-            watchers.Add(new Watcher("void", voidExWatchString, true).offsets(1, 0));
-            watcherTypes.Add("void", TagSubType.void_exact);
-            var vwatcher = watchers.Last();
+
+            var voidExWatchString = "<" + APP.SUB_TYPE_VOIDEX + ">";
+                voidExWatchString += " </" + APP.SUB_TYPE_VOIDEX + "> \\";
+            var vwatcher = new Watcher(APP.SUB_TYPE_VOIDEX, voidExWatchString, true).offsets(1, 0).setInsensitive(true);
+            watchers.Add(vwatcher);
+            watcherTypes.Add(APP.SUB_TYPE_VOIDEX, TagSubType.void_exact);
+
             watchers.Add(new Watcher(APP.SUB_TYPE_COMMENTS, "<!-- --> \\", true).offsets(0, 0));
             watcherTypes.Add(APP.SUB_TYPE_COMMENTS, TagSubType.comment);
             var comwatcher = watchers.Last();

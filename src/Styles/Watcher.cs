@@ -12,22 +12,22 @@ namespace Templification.Styles {
 
     public class Watcher {
 
+        public string       name      = "";
         public WatchSegment begin_chr = new WatchSegment();
         public WatchSegment end_chr   = new WatchSegment();
         public WatchSegment escape    = new WatchSegment();
-        public string      ignore = "";
-        public List<Bounds> matches = new List<Bounds>();
-        public WatchStage stage = WatchStage.first;
-        public bool suspended = false;
-        public bool active    = true;
-        public List<Bounds> suspends = new List<Bounds>();
-        public List<Bounds> mlengths = new List<Bounds>();
+        public string       ignore    = "";
+        public List<Bounds> matches   = new List<Bounds>();
+        public WatchStage   stage     = WatchStage.first;
+        public bool         suspended = false;
+        public bool         active    = true;
+        public List<Bounds> suspends  = new List<Bounds>();
+        public List<Bounds> mlengths  = new List<Bounds>();
         public bool can_nest     {get; set;} = false;
         public bool must_confirm {get; set;} = false;
         public bool insensitive  {get; set;} = false;
         public bool reporting    {get; set;} = false;
         public bool debug        {get; set;} = false;
-        public string name = "";
 
         public Watcher(){}
 
@@ -88,8 +88,8 @@ namespace Templification.Styles {
                 return new List<Bounds>{match_point, match_lengths};
             }
 
-            var record_index =  -1;
-            var matched_to   =  WatchStage.zero;
+            var record_index = -1;
+            var matched_to   = WatchStage.zero;
 
             if (this.begin_chr.consume(chr, this.insensitive) ) {
                 record_index = index + this.begin_chr.offset;
@@ -135,7 +135,7 @@ namespace Templification.Styles {
                             // RESET START IF CANT NEST AND FOUND SECOND STARTER
                             if (!this.can_nest && this.has_first() ) {
                                 if (this.begin_chr.value != this.end_chr.value ) {
-                                    this.matches.Last().b = record_index;
+                                    this.matches.Last().b  = record_index;
                                     this.mlengths.Last().b = this.begin_chr.chrmatched;
                                 }
                             }
@@ -268,6 +268,35 @@ namespace Templification.Styles {
         public Watcher offsets(int start_offset, int end_offset) {
             this.begin_chr.offset = start_offset;
             this.end_chr.offset = end_offset;
+            return this;
+        }
+
+        public Watcher setSuspended(bool suspended) {
+            this.suspended = suspended;
+            return this;
+        }
+        public Watcher setActive(bool active) {
+            this.active = active;
+            return this;
+        }
+        public Watcher setCanNest(bool can_nest) {
+            this.can_nest = can_nest;
+            return this;
+        }
+        public Watcher setMustConfirm(bool must_confirm) {
+            this.must_confirm = must_confirm;
+            return this;
+        }
+        public Watcher setInsensitive(bool insensitive) {
+            this.insensitive = insensitive;
+            return this;
+        }
+        public Watcher setReporting(bool reporting) {
+            this.reporting = reporting;
+            return this;
+        }
+        public Watcher setDebug(bool debug) {
+            this.debug = debug;
             return this;
         }
 
