@@ -145,7 +145,7 @@ namespace Templification.Tags {
 
         // Replace variables in node with values from orig_node
         // Commonly called after a node has been templatized (templates filled in)
-        public void replace_vars(TagBranch orig_node) {
+        public void replace_vars(TagBranch orig_node, bool isFinal) {
             var skip_tags  = new Dictionary<string,bool> {
                 {"script", true},
                 {"void", true},
@@ -153,10 +153,10 @@ namespace Templification.Tags {
                 {"!templification" ,true}
             };
 
-            var var_regex        = new Regex("((?<prevar>[^ ]+)[|])?[{](?<vars>[^ ]+)[}]");
             var orig_attribs     = orig_node.tag.attribs.clone();
             var orig_var_attribs = orig_node.tag.get_attribs_bytype(AttribType.variable);
             var self_tag         =  this.tag;
+
             if (skip_tags.ContainsKey(self_tag.name.ToLower().Trim()) ) {
                 // This tag (html elem) is in the skip list, so skip it
                 return;
@@ -178,33 +178,10 @@ namespace Templification.Tags {
                         self_tag.attribs[orig_attribs[name].value].value = self_tag.attribs[orig_attribs[name].value].value.Trim();
                     }
                 } else if (orig_var_attribs.Keys.Count > 0) {
-                    string new_attrib_value = attr.value;
                     // DOES ATTRIBUTE CONTAIN A VARIABLE
                     if (attr.value.Contains("{")) {
-                        // Replace special variable {default} with original node first node text, if it is text
-                        var matches = var_regex.Matches(new_attrib_value);
-                        foreach (var match in matches.ToList()) {
-                            var prevars      = match.Groups["prevar"].Value;
-                            var matched_vars = match.Groups["vars"].Value;
-                            var varParts = matched_vars.Split('|');
-                            var notReplaced = true;
-                            foreach(var vp in varParts) {
-                                var varKey = "{"+vp.ToLower()+"}";
-
-                                if (orig_var_attribs.ContainsKey(varKey)) {
-                                    var source_attrib = orig_var_attribs["{"+vp.ToLower()+"}"];
-                                    new_attrib_value = new_attrib_value.Replace(match.Value, source_attrib.value);
-                                    notReplaced = false;
-                                    break; // GET FIRST FOUND
-                                }
-                            }
-                            if (prevars.Length > 0 && notReplaced) {
-                                new_attrib_value = new_attrib_value.Replace(match.Value, prevars);
-                            }
-                        }
+                        attr.value = replace_var(attr.value, orig_var_attribs);
                     }
-                    // REPLACE VALUE WITH CHANGES
-                    attr.value = new_attrib_value;
                 }
                 if (Regex.Match(attr.value, @"[{]\s*default\s*[}]").Success) {
                     if (orig_node.children.Count > 0 && orig_node.children[0].tag.tag_type == TagType.text ) {
@@ -214,15 +191,7 @@ namespace Templification.Tags {
 
             }
 
-            // REPLACE TEXT
-            foreach (var key in orig_attribs.Keys) {
-                var attr = orig_attribs[key];
-                if (attr.type == AttribType.variable ) {
-                    if (!attr.value.ToLower().Contains("@html") ) {
-                        self_tag.tstr = self_tag.tstr.Replace(attr.name, attr.value);
-                    }
-                }
-            }
+            self_tag.tstr = replace_var(self_tag.tstr, orig_attribs, debug: "yes", isFinal: isFinal);
 
             // REPLACE {default} variable when it is in the text of a node not the attributes
             if (self_tag.tstr.Contains("{default}")) {
@@ -231,13 +200,69 @@ namespace Templification.Tags {
                 }
             }
 
-            replace_tag_str_vars(this, self_tag, orig_attribs);
             // REPLACE CHILDRENS VARIABLES, ALLOWS REPLACEMENT INTO CHILD NODES FROM TEMPLATE
             foreach (var child in this.children ) {
-                child.replace_vars(orig_node);
+                child.replace_vars(orig_node, isFinal);
             }
 
         } // END REPLACE_VARS FUNCTION
+
+
+
+        /// Replace a string source with a variable given an attribute value source
+        string replace_var(string strSource, Dictionary<string, Attribs> valueSource, bool makeLower = true, bool addBrackets = true, bool isFinal = false, string debug = "") {
+            var outValue         = strSource;
+            var var_regex        = new Regex("((?<prevar>[^ ]+)[|])?[{](?<vars>[^ ]+)[}]");
+            var style_var_regex  = new Regex("((?<prevar>[^ ]+)[|])?[\\{](?<vars>[^ ]+)[\\}]");
+            var matches          = var_regex.Matches(outValue);
+
+            foreach (var match in matches.ToList()) {
+                var prevars      = match.Groups["prevar"].Value;
+                var matched_vars = match.Groups["vars"].Value;
+                var varParts     = matched_vars.Split('|');
+                var notReplaced  = true;
+
+                // ATTEMPT REPLACEMENT VIA VARIABLE SUPPLIED BY USER
+                foreach(var vp in varParts) {
+                    var varKey = (makeLower ? vp.ToLower() : vp);
+                    varKey = addBrackets ? "{" + varKey + "}" : varKey;
+
+                    if (valueSource.ContainsKey(varKey)) {
+                        outValue = outValue.Replace(match.Value, valueSource[varKey].value);
+                        notReplaced = false;
+                        break; // Only one replacement per variable set
+                    }
+                }
+                // ATTEMPT TO REPLACE ANY PREDEFINED VARS
+                if (notReplaced) {
+                    foreach (var part in varParts ) {
+
+                        if (part == ":DATE:" ) {
+                            outValue = outValue.Replace(match.Value, DateTime.Now.ToString());
+                            notReplaced = false;
+                            break;
+                        } else if (part.StartsWith("$") ) {
+                            var tparent  =  this.parent;
+                            if (tparent != null ) {
+                                var tattribs  =  tparent.tag.attribs;
+                                var vattrname  =  part[1..];
+                                if (tattribs.ContainsKey(vattrname) ) {
+                                    outValue = outValue.Replace(match.Value, tattribs[vattrname].value);
+                                    notReplaced = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                // REPLACE WITH ORINAL MATCH IF NOT REPLACED
+                if (prevars.Length > 0 && notReplaced && isFinal) {
+                    outValue = outValue.Replace(match.Value, prevars);
+                }
+            }
+
+            return outValue;
+        }
 
 
 

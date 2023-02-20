@@ -8,7 +8,7 @@ namespace Templification.Templates {
     public class Templates {
 
         // POPULATE TEMPLATE AND RETURN THE HYDRATED VERSION
-        public static TagBranch use_template_tree(TagTree template, TagBranch usage, StyleSheet tree_styles) {
+        public static void use_template_tree(TagTree template, TagBranch usage, StyleSheet tree_styles) {
             usage.apply_local_style_tags(tree_styles);
             var skip_list   =  new Dictionary<int,string>();
             var orig_branch =  usage.clone();
@@ -50,7 +50,7 @@ namespace Templification.Templates {
 
             usage.merge_with_template(orig_branch, usage.style_sheet);
             usage.clear_vars(1);
-            usage.replace_vars(orig_branch);
+            usage.replace_vars(orig_branch, true);
             // LOCATE TAGS DEPENDING ON SLOT CONTENT
             var purge_slots = usage.locate_dep_slots();
             // REMOVE EMPTY SLOTS
@@ -67,7 +67,6 @@ namespace Templification.Templates {
                     wrap_branch(part, usage);
                 }
             }
-            return new TagBranch();
         }
 
         private static void wrap_branch(string tagName, TagBranch orig) {
