@@ -109,8 +109,8 @@ namespace Templification {
                 flag = "string",
                 abbrev = 'o',
                 name = "output",
-                description = "Directory, for the output files to be saved. It [default 'BASEDIR/bin']",
-                default_value = new string[]{"bin"},
+                description = "Directory, for the output files to be saved. It [default 'BASEDIR/build']",
+                default_value = new string[]{"build"},
                 display_in_help = true
             };
 

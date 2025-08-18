@@ -143,7 +143,8 @@ namespace Templification {
 
                 if (tag_tree.fileDetails != null) {
                     if (!string.IsNullOrEmpty(tag_tree.fileDetails.FileOutName)) {
-                        output_path = cmd_line_options.out_dir + tag_tree.fileDetails.FileOutName + "." + cmd_line_options.out_ext;
+                        output_path = cmd_line_options.out_dir + "/" + tag_tree.fileDetails.FileOutName + "." + cmd_line_options.out_ext;
+                        output_path = output_path.Replace("//","/");
                     }
                 }
 
