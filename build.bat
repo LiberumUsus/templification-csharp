@@ -22,5 +22,10 @@ IF "%~1" == "run" (
   exit
 )
 
+IF "%~1" == "publish" (
+  dotnet publish -- .\src --self-contained true --output .\build
+  exit
+)
+
 cd .\src
 dotnet build

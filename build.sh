@@ -26,6 +26,12 @@ then
     exit
 fi
 
+if [ "$1" == "publish" ]
+then
+    dotnet publish ./src/ --self-contained true --output ./build/
+    exit
+fi
+
 # Else build
 cd ./src
 dotnet build
