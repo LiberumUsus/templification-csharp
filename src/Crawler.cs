@@ -108,6 +108,13 @@ namespace Templification {
             var template_mapping = crawl_and_load_files(options.template_dir, options);
             var css_stylesheets  = crawl_and_load_css(options.css_dir);
 
+            // Purge template files from input files
+            foreach (var fileKey in input_mapping.Keys) {
+                if (template_mapping.ContainsKey(fileKey)) {
+                    input_mapping.Remove(fileKey);
+                }
+            }
+
             return new CrawlFiles(input_mapping, template_mapping, css_stylesheets);
         }
 

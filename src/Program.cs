@@ -67,8 +67,8 @@ namespace Templification {
                 flag = "string",
                 abbrev = 't',
                 name = "template",
-                default_value = new string[]{"template"},
-                description = "Directory, to be searched to find templates. [default 'BASEDIR/template']",
+                default_value = new string[]{"templates"},
+                description = "Directory, to be searched to find templates. [default 'BASEDIR/src/templates']",
                 display_in_help = true
             };
 
@@ -228,7 +228,7 @@ namespace Templification {
                         name = "config",
                         description = "Set a location for the config file. !Any additional flags will override flags set in the config file!",
                         display_in_help = true,
-                        default_value = new string[]{"templification.config"},
+                        default_value = new string[]{".tmplific_config"},
                         });
 
             app.AddFlag(new CLI.CLIFlag {
@@ -291,7 +291,7 @@ namespace Templification {
 
             var base_dir       =  cmd.GetString("basedir");
             var in_path        =  get_cli_path(cmd, "input",     "src",        base_dir);
-            var template_path  =  get_cli_path(cmd, "template",  "template",   base_dir);
+            var template_path  =  get_cli_path(cmd, "template",  "templates",  in_path);
             var style_dir      =  get_cli_path(cmd, "style-dir", "./src/",     base_dir,true);
             var css_in         =  get_cli_path(cmd, "css_in",    "src",        base_dir);
             var out_path       =  get_cli_path(cmd, "output",    "bin",        base_dir);
