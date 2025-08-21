@@ -188,7 +188,12 @@ namespace Templification.Styles {
                                     }
                                     var srules = snode.rules.clone();
                                     for (var i = 0; i < srules.Count; i++) {
-                                        srules[i].rvalue = srules[i].rvalue.Replace("{value}", vvalue + vunit);
+                                        if (srules[i].rvalue.Contains("{unit}")) {
+                                            srules[i].rvalue = srules[i].rvalue.Replace("{unit}", vunit);
+                                            srules[i].rvalue = srules[i].rvalue.Replace("{value}", vvalue);
+                                        } else {
+                                            srules[i].rvalue = srules[i].rvalue.Replace("{value}", vvalue + vunit);
+                                        }
                                         srules[i].key = srules[i].key.Replace("{dir}", direction);
                                         if (srules[i].key.Contains("{base}")) {
                                             srules[i].key = srules[i].key.Replace("{base}", gen_list.current_key);
@@ -200,7 +205,12 @@ namespace Templification.Styles {
                             } else {
                                 var srules = new List<Rule>(snode.rules);
                                 for (var i = 0; i < srules.Count; i++) {
-                                    srules[i].rvalue = srules[i].rvalue.Replace("{value}", vvalue + vunit);
+                                    if (srules[i].rvalue.Contains("{unit}")) {
+                                        srules[i].rvalue = srules[i].rvalue.Replace("{unit}", vunit);
+                                        srules[i].rvalue = srules[i].rvalue.Replace("{value}", vvalue);
+                                    } else {
+                                        srules[i].rvalue = srules[i].rvalue.Replace("{value}", vvalue + vunit);
+                                    }
                                     if (srules[i].key.Contains("{base}")) {
                                         srules[i].key = srules[i].key.Replace("{base}", gen_list.current_key);
                                     }
